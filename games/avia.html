@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Play55 - Aviator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#0a0e1a;color:#fff;display:flex;justify-content:center;padding:8px}
+.box{width:100%;max-width:430px}
+.top{display:flex;justify-content:space-between;align-items:center;background:#12182c;padding:10px 12px;border-radius:14px;border:1px solid #1e293b;margin-bottom:8px}
+.bal{color:#facc15;font-weight:bold;border:1px solid #334155;padding:6px 12px;border-radius:20px;background:#0f172a}
+.liveCount{font-size:11px;background:#0f172a;border:1px solid #334155;padding:5px 10px;border-radius:20px;color:#4ade80}
+.hist{display:flex;gap:6px;overflow:auto;padding:6px 0}
+.hist span{padding:5px 10px;border-radius:20px;font-size:12px;font-weight:bold;background:#151a2b;border:1px solid #2a3344}
+.green{color:#22c55e;border-color:#22c55e!important;background:#22c55e1a!important}.red{color:#ef4444}.pink{color:#ec4899}
+.graphBox{height:240px;background:radial-gradient(ellipse at 60% 40%,#1c2745,#0a0e1a 75%);border-radius:16px;border:1px solid #1e293b;position:relative;overflow:hidden;margin-bottom:10px}
+canvas{width:100%;height:100%}
+#center{position:absolute;top:42%;left:60%;transform:translate(-50%,-50%);text-align:center;z-index:3}
+#mult{font-size:48px;font-weight:900}
+#plane{position:absolute;left:0;bottom:0;font-size:36px;z-index:4;filter:drop-shadow(0 4px 8px #000)}
+.status{text-align:center;font-size:11px;color:#facc15;font-weight:bold}
+.betPanel{background:#12182c;border:1px solid #1e293b;border-radius:12px;padding:8px;margin-bottom:8px;transition:0.2s}
+.betPanel.lockedPanel{opacity:0.5;pointer-events:none;border-color:#ef4444}
+.betRow{display:flex;gap:8px;margin-bottom:8px}
+.betRow input{flex:1;padding:11px;border-radius:10px;border:1px solid #334155;background:#0a0e1a;color:#fff;font-weight:bold}
+.smallRow{display:flex;gap:6px;margin-bottom:8px}
+.smallRow button{flex:1;padding:6px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#94a3b8;font-size:12px}
+.btn{width:100%;padding:12px;border:0;border-radius:10px;font-weight:900;font-size:13px}
+.betBtn{background:linear-gradient(180deg,#facc15,#eab308);color:#000}
+.cashBtn{background:linear-gradient(180deg,#22c55e,#16a34a);color:#fff}
+.lockText{font-size:10px;color:#ef4444;text-align:center;margin-top:5px;display:none}
+.tableWrap{background:#12182c;border:1px solid #1e293b;border-radius:12px;overflow:hidden;margin-top:6px}
+.tableHead{display:grid;grid-template-columns:1.2fr 0.7fr 0.6fr 0.8fr;background:#0f172a;padding:8px 10px;font-size:11px;color:#94a3b8;font-weight:bold}
+.tableBody{max-height:180px;overflow:auto}
+.tableRow{display:grid;grid-template-columns:1.2fr 0.7fr 0.6fr 0.8fr;padding:7px 10px;font-size:12px;border-top:1px solid #1e293b}
+.win{color:#22c55e;font-weight:bold}
+.backBtn{background:#1e293b;border:1px solid #334155;color:#fff;width:30px;height:30px;border-radius:8px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+</style>
+</head>
+<body>
+<div class="box">
+<div class="top"><div style="display:flex;align-items:center;gap:8px"><button class="backBtn" onclick="goBack()">‹</button><b>✈️ AVIATOR</b></div><div style="display:flex;gap:8px;align-items:center"><div class="liveCount">👁️ <span id="liveCount">543</span> Live</div><div class="bal">🪙 <span id="balance">0</span></div></div></div>
+<div class="hist" id="hist"></div>
+<div class="graphBox" id="gBox"><canvas id="cv"></canvas><div id="plane">✈️</div><div id="center"><div id="mult">1.00x</div><div class="status" id="status">Waiting</div></div></div>
+<div class="betPanel" id="panel1">
+<div class="betRow"><input type="number" id="bet1" value="100" max="5000"><input type="number" id="auto1" placeholder="Auto 2.00x"></div>
+<div class="smallRow"><button onclick="setBet(1,100)">100</button><button onclick="setBet(1,500)">500</button><button onclick="setBet(1,1000)">1K</button><button onclick="setBet(1,5000)">5K MAX</button></div>
+<button class="btn betBtn" id="betBtn1" onclick="placeBet(1)">BET</button>
+<button class="btn cashBtn" id="cashBtn1" style="display:none" onclick="cash(1)">CASHOUT <span id="cashVal1">0</span></button>
+<div class="lockText" id="lockText1">🔒 BET LOCKED - Flying</div>
+</div>
+<div class="betPanel" id="panel2">
+<div class="betRow"><input type="number" id="bet2" value="100" max="5000"><input type="number" id="auto2" placeholder="Auto 2.00x"></div>
+<div class="smallRow"><button onclick="setBet(2,100)">100</button><button onclick="setBet(2,500)">500</button><button onclick="setBet(2,1000)">1K</button><button onclick="setBet(2,5000)">5K MAX</button></div>
+<button class="btn betBtn" id="betBtn2" onclick="placeBet(2)">BET - 2nd</button>
+<button class="btn cashBtn" id="cashBtn2" style="display:none" onclick="cash(2)">CASHOUT <span id="cashVal2">0</span></button>
+<div class="lockText" id="lockText2">🔒 BET LOCKED - Flying</div>
+</div>
+<div class="tableWrap">
+<div class="tableHead"><div>username</div><div>total bet</div><div>x</div><div>total win</div></div>
+<div class="tableBody" id="tableBody"></div>
+</div>
+</div>
+
+<script type="module">
+import { db } from '../firebase.js';
+import { doc, getDoc, updateDoc, increment, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const username = (localStorage.getItem("play55_current_user")||"demo").toLowerCase();
+let fbCoins=0;
+window.fbUsername=username;
+
+async function initBal(){
+  const ref=doc(db,"clients",username);
+  const snap=await getDoc(ref);
+  if(!snap.exists()){ document.getElementById("balance").innerText=0; return; }
+  fbCoins=snap.data().coins||0;
+  window.bal=fbCoins;
+  document.getElementById("balance").innerText=Math.floor(fbCoins);
+  localStorage.setItem("play55_balance",Math.floor(fbCoins));
+  onSnapshot(ref,(s)=>{
+    if(s.exists()){
+      fbCoins=s.data().coins||0;
+      window.bal=fbCoins;
+      document.getElementById("balance").innerText=Math.floor(fbCoins);
+      localStorage.setItem("play55_balance",Math.floor(fbCoins));
+    }
+  });
+}
+window.getBal=()=> window.bal||fbCoins||0;
+window.setBal=(v)=>{ window.bal=v; document.getElementById("balance").innerText=Math.floor(v); localStorage.setItem("play55_balance",Math.floor(v)); }
+window.fbDeduct=async(amt,reason)=>{
+  const now=new Date();
+  await updateDoc(doc(db,"clients",username),{
+    coins: increment(-amt),
+    history: arrayUnion({date:now.toLocaleString("en-IN"), day:now.toLocaleDateString("en-IN"), iso:now.toISOString(), time:now.toLocaleString(), amount:amt, type:"CUT", reason:reason||"Aviator Bet", ref:"BET-"+Date.now().toString().slice(-6), balance:fbCoins-amt, game:"AVIATOR-LITE"})
+  });
+}
+window.fbAdd=async(amt,reason,crashX)=>{
+  const now=new Date();
+  await updateDoc(doc(db,"clients",username),{
+    coins: increment(amt),
+    history: arrayUnion({date:now.toLocaleString("en-IN"), day:now.toLocaleDateString("en-IN"), iso:now.toISOString(), time:now.toLocaleString(), amount:amt, type:"ADD", reason:reason||`Win ${crashX}x`, ref:"WIN-"+Date.now().toString().slice(-6), balance:fbCoins+amt, game:"AVIATOR-LITE", crash:crashX})
+  });
+}
+initBal();
+</script>
+
+<script>
+function goBack(){ window.location.href='../index.html'; }
+function mask(){const p=["go","ra","sk","vi","an","ro","pr","mu","ji","ak"]; return `${p[Math.floor(Math.random()*p.length)]}***${Math.floor(Math.random()*90)+10}`}
+const cv=document.getElementById("cv"), ctx=cv.getContext("2d"), multEl=document.getElementById("mult"), plane=document.getElementById("plane"), statusEl=document.getElementById("status"), gBox=document.getElementById("gBox");
+function resize(){cv.width=gBox.offsetWidth*2; cv.height=gBox.offsetHeight*2} resize();
+let mult=1, crash=0, flying=false, timer=null, progress=0, bettingOpen=true;
+let bets={1:{placed:false,amt:0},2:{placed:false,amt:0}}
+function draw(p){
+ ctx.clearRect(0,0,cv.width,cv.height);
+ ctx.strokeStyle="#ffffff08"; ctx.lineWidth=1;
+ for(let i=1;i<4;i++){ctx.beginPath();ctx.moveTo(0,cv.height/4*i*2);ctx.lineTo(cv.width,cv.height/4*i*2);ctx.stroke()}
+ let startX=10, startY=cv.height-20, endX=cv.width*0.62, endY=cv.height*0.35;
+ let curX=startX + (endX-startX)*p, curY=startY - (startY-endY)*Math.pow(p,0.7);
+ ctx.beginPath(); ctx.strokeStyle="#ef4444"; ctx.lineWidth=5; ctx.lineCap="round";
+ ctx.moveTo(startX,startY); ctx.quadraticCurveTo(cv.width*0.25, cv.height*0.85, curX, curY); ctx.stroke();
+ ctx.beginPath(); ctx.strokeStyle="#ef444422"; ctx.lineWidth=20; ctx.moveTo(startX,startY); ctx.quadraticCurveTo(cv.width*0.25, cv.height*0.85, curX, curY); ctx.stroke();
+ plane.style.left=(curX/2 - 18)+"px"; plane.style.bottom=(cv.height/2 - curY/2 + 10)+"px"; plane.style.transform=`rotate(${ -5 + p*25 }deg)`;
+}
+function genCrash(){let r=Math.random(); if(r<0.55) return 1.1+Math.random()*1.2; if(r<0.8) return 2+Math.random()*3; if(r<0.95) return 5+Math.random()*10; return 15+Math.random()*40;}
+function setBetting(state){
+ bettingOpen=state;
+ [1,2].forEach(k=>{
+  const panel=document.getElementById("panel"+k);
+  const lockText=document.getElementById("lockText"+k);
+  const betBtn=document.getElementById("betBtn"+k);
+  if(!state &&!bets[k].placed){ panel.classList.add("lockedPanel"); lockText.style.display="block"; betBtn.disabled=true; }
+  else { panel.classList.remove("lockedPanel"); lockText.style.display="none"; betBtn.disabled=false; }
+ });
+}
+function startBettingPhase(){
+ setBetting(true);
+ let count=5; multEl.innerText="1.00x"; multEl.style.color="#fff"; plane.style.display="none"; draw(0);
+ statusEl.innerText=`Betting - ${count}s`;
+ let t=setInterval(()=>{ count--; if(count>0){ statusEl.innerText=`Betting Open - ${count}s - Place Bet`; } else { clearInterval(t); startRound(); } },1000);
+}
+function startRound(){
+ setBetting(false); flying=true; mult=1; crash=genCrash(); progress=0;
+ statusEl.innerText="Flying..."; plane.style.display="block"; draw(0);
+ timer=setInterval(()=>{
+  progress+=0.004;
+  if(progress>1) progress=1;
+  mult+=0.008+mult*0.005;
+  multEl.innerText=mult.toFixed(2)+"x";
+  if(bets[1].placed) document.getElementById("cashVal1").innerText=Math.floor(bets[1].amt*mult);
+  if(bets[2].placed) document.getElementById("cashVal2").innerText=Math.floor(bets[2].amt*mult);
+  draw(progress);
+  [1,2].forEach(k=>{if(bets[k].placed){let a=parseFloat(document.getElementById("auto"+k).value); if(!isNaN(a)&&mult>=a) cash(k)}});
+  if(mult>=crash) crashNow();
+ },80);
+}
+function crashNow(){
+ clearInterval(timer); flying=false; multEl.innerText=crash.toFixed(2)+"x"; multEl.style.color="#ef4444"; statusEl.innerText=`💥 FLEW AWAY ${crash.toFixed(2)}x`;
+ let s=document.createElement("span"); s.innerText=crash.toFixed(2)+"x"; s.className=crash>=2?(crash>=10?"pink":"green"):"red"; document.getElementById("hist").prepend(s);
+ [1,2].forEach(k=>{if(bets[k].placed){addRow(mask(),bets[k].amt,"-",0); bets[k].placed=false; document.getElementById("cashBtn"+k).style.display="none"; document.getElementById("betBtn"+k).style.display="block";}});
+ setTimeout(startBettingPhase,1000);
+}
+function setBet(k,v){if(v>5000)v=5000; document.getElementById("bet"+k).value=v}
+async function placeBet(k){
+ if(!bettingOpen){ alert("🔒 Bet Locked - Plane flying hai"); return; }
+ let amt=parseInt(document.getElementById("bet"+k).value); if(!amt) return;
+ if(amt>5000){alert("Max 5K"); amt=5000; document.getElementById("bet"+k).value=5000;}
+ if(bets[k].placed) return;
+ let bal=getBal(); if(bal<amt){alert("Balance kam - Admin se Add karwao"); return;}
+ try{ await window.fbDeduct(amt,`Aviator Lite Bet ${amt}`); }catch(e){alert(e.message); return;}
+ setBal(bal-amt);
+ bets[k]={placed:true,amt}; document.getElementById("betBtn"+k).style.display="none"; document.getElementById("cashBtn"+k).style.display="block";
+ document.getElementById("panel"+k).classList.remove("lockedPanel");
+}
+async function cash(k){
+ if(!bets[k].placed||!flying) return; let win=Math.floor(bets[k].amt*mult);
+ try{ await window.fbAdd(win,`Aviator Lite Win ${mult.toFixed(2)}x`,mult.toFixed(2)); }catch(e){alert(e.message); return;}
+ setBal(getBal()+win);
+ bets[k].placed=false; document.getElementById("cashBtn"+k).style.display="none"; document.getElementById("betBtn"+k).style.display="block";
+ addRow(mask(),bets[k].amt,mult.toFixed(2)+"x",win);
+}
+function addRow(user,bet,x,win){
+ let div=document.createElement("div"); div.className="tableRow";
+ div.innerHTML=`<div>${user}</div><div>₹${bet}</div><div>${x}</div><div class="${win>0?'win':''}">${win>0?'₹'+win:'-₹'+bet}</div>`;
+ document.getElementById("tableBody").prepend(div);
+ if(document.getElementById("tableBody").children.length>25) document.getElementById("tableBody").lastChild.remove();
+}
+function updateLive(){document.getElementById("liveCount").innerText=Math.floor(200+Math.random()*800);}
+setInterval(updateLive,3000); updateLive();
+for(let i=0;i<6;i++){let v=(1+Math.random()*8).toFixed(2); let cl=v>=2?"green":"red"; document.getElementById("hist").innerHTML+=`<span class="${cl}">${v}x</span>`}
+for(let i=0;i<12;i++){let b=[100,200,500,1000,2000][Math.floor(Math.random()*5)]; let x=(1+Math.random()*6).toFixed(2); let w=Math.floor(b*parseFloat(x)); if(Math.random()>0.4) addRow(mask(),b,x+"x",w); else addRow(mask(),b,"-",0);}
+startBettingPhase();
+</script>
+</body>
+</html>

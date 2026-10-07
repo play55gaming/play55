@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Play55 - Crash 3D</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial Black,Arial}
+body{background:#000;color:#fff;overflow:hidden;height:100dvh}
+.top{position:absolute;top:0;left:0;right:0;z-index:30;background:rgba(0,0,0,.85);padding:8px 12px;display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:6px;font-weight:900;font-style:italic;color:#ffcc00;border:1.5px solid #ffcc00;padding:4px 12px;border-radius:8px;background:#000;font-size:16px}
+.logo i{font-style:normal;background:#ffcc00;color:#000;padding:2px 6px;border-radius:4px;font-size:12px}
+.bal{background:linear-gradient(90deg,#0e2a12,#1a5a25);border:1px solid #00ff88;border-radius:30px;padding:6px 14px;font-weight:900;font-size:13px}
+.backBtnTop{padding:6px 14px;border-radius:20px;background:#111;border:1px solid #ffcc00;color:#ffcc00;font-size:12px;font-weight:900}
+.gameArea{width:100vw;height:100dvh;position:relative;background:radial-gradient(ellipse at bottom, #1a0a2e 0%, #05000a 60%, #000 100%)}
+#lightGlow{position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 30% 80%, rgba(255,80,0,0.15) 0%, transparent 60%);z-index:2;pointer-events:none}
+#starCanvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1}
+#mainCanvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:4}
+.centerUI{position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);z-index:10;text-align:center;pointer-events:none}
+#mult{font-size:72px;font-weight:900;color:#ffcc00;text-shadow:0 0 25px #ffcc00,0 3px 0 #000;line-height:1}
+#mult.crash{color:#ff2a2a;text-shadow:0 0 30px #ff0000;animation:shake .4s}
+#mult.won{color:#00ff88;text-shadow:0 0 25px #00ff88}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+#status{margin-top:6px;font-size:11px;color:#ddd;font-family:Arial;background:rgba(0,0,0,.75);padding:5px 14px;border-radius:20px;border:1px solid #333}
+.leftLive{position:absolute;left:6px;top:65px;z-index:15;width:115px}
+.liveItem{background:rgba(0,0,0,.7);border:1px solid #333;border-radius:6px;padding:4px 6px;margin-bottom:3px;font-size:8px;display:flex;justify-content:space-between;font-family:Arial;color:#aaa}
+.liveItem.win{border-color:#00ff88;color:#00ff88}
+.rightHistory{position:absolute;right:6px;top:65px;z-index:15;display:flex;flex-direction:column;gap:3px}
+.hist{padding:3px 8px;border-radius:12px;font-size:10px;font-weight:900;border:1px solid}
+.hist.green{background:#0e2a12;color:#00ff88;border-color:#1a5a25}
+.hist.red{background:#2a0e12;color:#ff4a4a;border-color:#5a1a25}
+.bottomPanel{position:absolute;bottom:0;left:0;right:0;z-index:20;background:linear-gradient(180deg,#1e1a3a 0%,#15122e 50%,#0e0b22 100%);padding:10px 10px 14px;border-top:2px solid #c9a227;border-radius:14px 14px 0 0;box-shadow:0 -5px 25px rgba(0,0,0,.9)}
+.chips{display:flex;gap:4px;justify-content:center;margin-bottom:8px}
+.chips button{flex:1;max-width:64px;padding:9px 0;border-radius:8px;border:1px solid #3a3560;background:#0e0b1a;color:#c9a227;font-weight:900;font-size:11px}
+.betRow{display:flex;gap:5px;align-items:center}
+.betRow input{width:82px;background:#000;border:1.5px solid #c9a227;color:#ffcc00;border-radius:8px;padding:11px 5px;font-size:14px;font-weight:900;text-align:center;outline:none}
+.betBtn{flex:1;padding:12px;border-radius:9px;border:0;font-weight:900;font-size:13px}
+.btnBet{background:linear-gradient(90deg,#ffd700,#c9a227);color:#000}
+.btnCash{background:linear-gradient(90deg,#00ff88,#00c853);color:#000;display:none}
+.timerBar{height:3px;background:#c9a227;transition:width 1s linear;border-radius:2px;margin-top:6px}
+#winToast{position:absolute;bottom:135px;left:50%;transform:translateX(-50%);z-index:25;background:rgba(0,255,136,.12);border:1px solid #00ff88;color:#00ff88;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:900;display:none;backdrop-filter:blur(6px)}
+</style>
+</head>
+<body>
+<div class="gameArea">
+<div id="lightGlow"></div>
+<canvas id="starCanvas"></canvas>
+<canvas id="mainCanvas"></canvas>
+<div class="top">
+<div class="logo"><i>55</i> Play55 • CRASH 3D</div>
+<div style="display:flex;gap:8px;align-items:center"><div class="bal">🪙 <span id="bal">0</span></div><button class="backBtnTop" onclick="location.href='../index.html'">← BACK</button></div>
+</div>
+<div class="leftLive" id="liveBoard"></div>
+<div class="rightHistory" id="history"></div>
+<div class="centerUI"><div id="mult">1.00x</div><div id="status">🚀 WAITING FOR NEXT</div></div>
+<div id="winToast"></div>
+<div class="bottomPanel">
+<div class="chips"><button onclick="setBet(10)">₹10</button><button onclick="setBet(50)">₹50</button><button onclick="setBet(100)">₹100</button><button onclick="setBet(500)">₹500</button><button onclick="setBet(1000)">1K</button></div>
+<div class="betRow"><input id="betAmt" type="number" value="100"><button id="betBtn" class="betBtn btnBet" onclick="placeBet()">BET 🚀</button><button id="cashBtn" class="betBtn btnCash" onclick="cashout()">CASHOUT ₹<span id="cashAmt">0</span></button><button onclick="toggleAuto()" id="autoBtn" style="padding:11px 6px;border-radius:9px;background:#0e0b1a;border:1px solid #3a3560;color:#c9a227;font-size:9px;font-weight:900">AUTO</button></div>
+<div id="timerWrap" style="display:none"><div style="display:flex;justify-content:space-between;font-size:9px;color:#c9a227;margin-top:7px"><span>NEXT ROUND</span><span id="timerTxt">5s</span></div><div class="timerBar" id="timerBar" style="width:100%"></div></div>
+</div>
+</div>
+
+<script type="module">
+import { db } from '../firebase.js';
+import { doc, getDoc, updateDoc, increment, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const username = (localStorage.getItem("play55_current_user")||"demo").toLowerCase();
+let fbCoins=0;
+window.fbUsername=username;
+async function initBal(){
+  const ref=doc(db,"clients",username);
+  const snap=await getDoc(ref);
+  if(snap.exists()){
+    fbCoins=snap.data().coins||0;
+    window.balance=fbCoins;
+    document.getElementById("bal").innerText=Math.floor(fbCoins);
+    localStorage.setItem("play55_balance",Math.floor(fbCoins));
+    onSnapshot(ref,(s)=>{
+      if(s.exists()){
+        fbCoins=s.data().coins||0;
+        window.balance=fbCoins;
+        document.getElementById("bal").innerText=Math.floor(fbCoins);
+        localStorage.setItem("play55_balance",Math.floor(fbCoins));
+      }
+    });
+  }
+}
+window.fbDeduct=async(amt,reason)=>{
+  const now=new Date();
+  await updateDoc(doc(db,"clients",username),{
+    coins: increment(-amt),
+    history: arrayUnion({date:now.toLocaleString("en-IN"), day:now.toLocaleDateString("en-IN"), iso:now.toISOString(), amount:amt, type:"CUT", reason:reason, ref:"BET-"+Date.now().toString().slice(-6), balance:fbCoins-amt, game:"CRASH-3D"})
+  });
+}
+window.fbAdd=async(amt,reason,crashX)=>{
+  const now=new Date();
+  await updateDoc(doc(db,"clients",username),{
+    coins: increment(amt),
+    history: arrayUnion({date:now.toLocaleString("en-IN"), day:now.toLocaleDateString("en-IN"), iso:now.toISOString(), amount:amt, type:"ADD", reason:reason, ref:"WIN-"+Date.now().toString().slice(-6), balance:fbCoins+amt, game:"CRASH-3D", crash:crashX})
+  });
+}
+initBal();
+</script>
+
+<script>
+let balance=1000;
+let bet=100,isFlying=false,currMult=1.0,crashPoint=2.45,loop=null,won=0,hasBet=false,hasCashed=false,autoMode=false,autoCashVal=2.0;
+let historyData=JSON.parse(localStorage.getItem("play55_crash_history")||"[2.45,1.12,5.2,1.01,3.33,12.5,1.8,2.1]");
+const mainCanvas=document.getElementById("mainCanvas"),mCtx=mainCanvas.getContext("2d");
+const starCanvas=document.getElementById("starCanvas"),sCtx=starCanvas.getContext("2d");
+function resize(){[mainCanvas,starCanvas].forEach(c=>{c.width=window.innerWidth*2;c.height=window.innerHeight*2;c.style.width=window.innerWidth+"px";c.style.height=window.innerHeight+"px";});}resize();window.addEventListener("resize",resize);
+let stars=[];for(let i=0;i<220;i++)stars.push({x:Math.random()*2-1,y:Math.random()*2-1,z:Math.random()*2});
+function drawStars(){sCtx.clearRect(0,0,starCanvas.width,starCanvas.height);stars.forEach(st=>{st.z-=0.01;if(st.z<=0){st.z=2;st.x=Math.random()*2-1;st.y=Math.random()*2-1;}let px=(st.x/st.z)*500+starCanvas.width/2;let py=(st.y/st.z)*500+starCanvas.height/2;let size=(1-st.z/2)*2.8;sCtx.fillStyle=`rgba(255,255,255,${1-st.z/2})`;sCtx.beginPath();sCtx.arc(px,py,size,0,Math.PI*2);sCtx.fill();});requestAnimationFrame(drawStars);}drawStars();
+
+let planeImg=new Image(); planeImg.src='images/plane.png?v='+Date.now(); let imgLoaded=false;
+planeImg.onload=()=>{imgLoaded=true;}; planeImg.onerror=()=>{ planeImg.src='./images/plane.png'; };
+
+let rocket={x:0,y:0},orbitAngle=0;
+function drawScene(mult){
+  mCtx.clearRect(0,0,mainCanvas.width,mainCanvas.height);
+  mCtx.shadowColor="#ff3300";mCtx.shadowBlur=20;mCtx.strokeStyle="#ff4400";mCtx.lineWidth=6;mCtx.lineCap="round";mCtx.beginPath();
+  let startY=mainCanvas.height*0.78,maxX=mainCanvas.width*0.70,curX,curY,baseTopY=startY-(mainCanvas.height*0.45);
+  if(mult<=4){ let p=(mult-1)/3; if(p<0)p=0; if(p>1)p=1; curX=p*maxX; let curve=Math.pow(p,1.65); curY=startY-curve*(mainCanvas.height*0.45);
+    for(let i=0;i<=120;i++){let pp=i/120*p;let xx=pp*maxX;let cc=Math.pow(pp,1.65);let yy=startY-cc*(mainCanvas.height*0.45);if(i==0)mCtx.moveTo(xx,yy);else mCtx.lineTo(xx,yy);}
+  }else{ orbitAngle+=0.12; curX=maxX+Math.sin(orbitAngle)*6; curY=baseTopY+Math.cos(orbitAngle)*4;
+    for(let i=0;i<=120;i++){let pp=i/120;let xx=pp*maxX;let cc=Math.pow(pp,1.65);let yy=startY-cc*(mainCanvas.height*0.45);if(i==0)mCtx.moveTo(xx,yy);else mCtx.lineTo(xx,yy);}
+  }
+  mCtx.stroke();mCtx.shadowBlur=0;rocket.x=curX;rocket.y=curY;
+  if(isFlying){
+    let angle = mult<=4 ? -0.6 : -0.6 + Math.sin(orbitAngle)*0.08;
+    let bx = rocket.x - Math.cos(angle)*175; let by = rocket.y - Math.sin(angle)*175;
+    for(let i=0;i<12;i++){
+      let len=55+Math.random()*70+currMult*2; let spread=(Math.random()-0.5)*13;
+      mCtx.save();mCtx.translate(bx,by);mCtx.rotate(angle+Math.PI);mCtx.globalAlpha=0.92-i*0.075;
+      if(i<2){ mCtx.fillStyle="#ffffbb"; mCtx.shadowColor="#ffff00"; mCtx.shadowBlur=22; mCtx.beginPath();mCtx.ellipse(-len/2,spread,len*0.6,5,0,0,Math.PI*2);mCtx.fill(); }
+      else{ mCtx.fillStyle=i%2==0?"#ff6600":"#ff2222"; mCtx.shadowColor="#ff4400"; mCtx.shadowBlur=24; mCtx.beginPath();mCtx.ellipse(-len/2,spread,len,8+Math.random()*4,0,0,Math.PI*2);mCtx.fill(); }
+      mCtx.restore();
+    }
+    mCtx.save();mCtx.translate(rocket.x,rocket.y);mCtx.rotate(angle);
+    if(imgLoaded){ let pw=300, ph=100; mCtx.drawImage(planeImg,-pw/2,-ph/2,pw,ph); }
+    else{ mCtx.fillStyle="#ff2222";mCtx.beginPath();mCtx.moveTo(80,0);mCtx.lineTo(-60,-25);mCtx.lineTo(-60,25);mCtx.closePath();mCtx.fill(); }
+    mCtx.restore();
+  }
+}
+function updateBal(){document.getElementById("bal").innerText=Math.floor(balance);localStorage.setItem("play55_balance",Math.floor(balance));}
+function setBet(v){bet=v;document.getElementById("betAmt").value=v;}document.getElementById("betAmt").addEventListener("input",e=>{bet=Math.max(10,parseInt(e.target.value)||10);});
+function genCrashPoint(){let r=Math.random();if(r<0.48)return +(1+Math.random()*1.2).toFixed(2);if(r<0.82)return +(2.2+Math.random()*3.8).toFixed(2);if(r<0.95)return +(6+Math.random()*14).toFixed(2);return +(20+Math.random()*80).toFixed(2);}
+function renderHistory(){let h=document.getElementById("history");h.innerHTML="";historyData.slice(-8).reverse().forEach(v=>{let d=document.createElement("div");d.className="hist "+(v>=2?"green":"red");d.innerText=v.toFixed(2)+"x";h.appendChild(d);});}
+let fakeNames=["Rahul","Amit","Vikram","Sahil","Raj","Arjun","Karan","Rohit","Ankit"];
+function pushLive(name,mult){let board=document.getElementById("liveBoard");let div=document.createElement("div");div.className="liveItem win";let shortName=name.length>6?name.substring(0,5):name;div.innerHTML=`<span>${shortName} ${mult}x</span><span>✓</span>`;board.prepend(div);if(board.children.length>5)board.lastChild.remove();}
+setInterval(()=>{if(isFlying&&hasBet&&!hasCashed&&Math.random()>0.55){let fakeMult=(currMult-(0.15+Math.random()*0.9)).toFixed(2);if(fakeMult>=1.05&&parseFloat(fakeMult)<currMult){let n=fakeNames[Math.floor(Math.random()*fakeNames.length)];pushLive(n,fakeMult);}}},850);
+async function placeBet(){
+  if(isFlying)return;
+  bet=Math.max(10,parseInt(document.getElementById("betAmt").value)||10);
+  if(balance<bet){alert("Balance kam hai! Admin se Add karwao");return;}
+  try{ await window.fbDeduct(bet,`Crash 3D Bet ${bet}`); }catch(e){ alert(e.message); return; }
+  balance-=bet; updateBal(); hasBet=true; hasCashed=false;
+  document.getElementById("status").innerText="BET ₹"+bet+" PLACED";
+  document.getElementById("betBtn").innerText="WAITING...";
+}
+function startFlight(){
+  isFlying=true;currMult=1.0;crashPoint=genCrashPoint();hasCashed=false;orbitAngle=0;
+  document.getElementById("mult").classList.remove("crash","won");
+  document.getElementById("mult").innerText="1.00x";
+  document.getElementById("status").innerText="🚀 FLYING";
+  document.getElementById("winToast").style.display="none";
+  document.getElementById("betBtn").style.display="none";
+  if(hasBet)document.getElementById("cashBtn").style.display="block";
+  else{document.getElementById("betBtn").style.display="none";document.getElementById("cashBtn").style.display="none";}
+  loop=setInterval(()=>{
+    currMult+=0.016+currMult*0.01;currMult=+currMult.toFixed(2);
+    document.getElementById("mult").innerText=currMult.toFixed(2)+"x";
+    if(hasBet&&!hasCashed){won=Math.floor(bet*currMult);document.getElementById("cashAmt").innerText=won;if(autoMode&&currMult>=autoCashVal)cashout();}
+    drawScene(currMult);if(currMult>=crashPoint)doCrash();
+  },60);
+}
+function doCrash(){
+  clearInterval(loop);isFlying=false;
+  document.getElementById("mult").classList.add("crash");
+  document.getElementById("mult").innerText=crashPoint.toFixed(2)+"x";
+  document.getElementById("status").innerText="💥 CRASHED @ "+crashPoint.toFixed(2)+"x";
+  document.getElementById("cashBtn").style.display="none";
+  document.getElementById("betBtn").style.display="block";
+  document.getElementById("betBtn").innerText=(hasBet&&!hasCashed)?"LOST ₹"+bet+" - AGAIN":(hasCashed?"WIN ₹"+won+" - NEXT":"BET NEXT");
+  historyData.push(crashPoint);if(historyData.length>60)historyData.shift();
+  localStorage.setItem("play55_crash_history",JSON.stringify(historyData));
+  renderHistory();hasBet=false;hasCashed=false;won=0;startCountdown();
+}
+async function cashout(){
+  if(!isFlying||!hasBet||hasCashed)return;hasCashed=true;
+  try{ await window.fbAdd(won,`Crash 3D Win @ ${currMult.toFixed(2)}x`,currMult.toFixed(2)); }catch(e){ alert(e.message); return; }
+  balance+=won;updateBal();
+  document.getElementById("mult").classList.add("won");
+  document.getElementById("mult").innerText=currMult.toFixed(2)+"x";
+  document.getElementById("status").innerText="✅ CASHED @ "+currMult.toFixed(2)+"x";
+  let toast=document.getElementById("winToast");toast.innerText="✅ WIN ₹"+won+" @ "+currMult.toFixed(2)+"x";toast.style.display="block";
+  setTimeout(()=>{toast.style.display="none";},2800);
+  document.getElementById("cashBtn").style.display="none";document.getElementById("betBtn").style.display="block";
+  document.getElementById("betBtn").innerText="WIN ₹"+won+" - FLYING...";pushLive("YOU",currMult.toFixed(2));
+}
+function startCountdown(){let sec=5;document.getElementById("timerWrap").style.display="block";let cd=setInterval(()=>{sec--;document.getElementById("timerTxt").innerText=sec+"s";document.getElementById("timerBar").style.width=(sec/5*100)+"%";if(sec<=0){clearInterval(cd);document.getElementById("timerWrap").style.display="none";document.getElementById("betBtn").innerText="BET 🚀";startFlight();}},1000);}
+function toggleAuto(){autoMode=!autoMode;if(autoMode){let v=prompt("Auto cashout x?","2.00");if(v){autoCashVal=parseFloat(v)||2.0;}}document.getElementById("autoBtn").innerText=autoMode?autoCashVal+"x":"AUTO";}
+renderHistory();drawScene(1.0);setTimeout(startFlight,1000);
+</script>
+</body>
+</html>

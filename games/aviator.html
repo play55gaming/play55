@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"><title>Play55 Aviator</title><style>*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}body{background:#070a1a;color:#fff;overflow-x:hidden}.header{height:48px;background:#1e3ecf;display:flex;align-items:center;justify-content:space-between;padding:0 12px;position:sticky;top:0;z-index:10}.logo{font-weight:900;font-size:24px;color:#ff1a1a;font-style:italic}.logo span{color:#ffcc00;font-size:28px}.hdrRight{font-size:11px;display:flex;gap:10px;align-items:center}.badge{background:#0f206e;padding:5px 10px;border-radius:16px;font-weight:700}.histRow{display:flex;gap:8px;padding:7px 10px;background:#070a1a;overflow-x:auto;white-space:nowrap;border-bottom:1px solid #1b2347;align-items:center}.histRow::-webkit-scrollbar{display:none}.hist{font-size:11px;font-weight:800;padding:3px 8px;border-radius:12px;background:#121630}.hist.blue{color:#5eb0ff}.hist.pink{color:#ff4d8a}.fairBtn{background:#111c4a;border:1px solid #2a3a7a;color:#7aa0ff;font-size:10px;font-weight:800;padding:4px 10px;border-radius:12px;cursor:pointer;margin-left:auto;flex-shrink:0}.game{position:relative;width:100%;height:440px;background:#070b26;overflow:hidden}canvas{position:absolute;inset:0;width:100%;height:100%}.center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;z-index:4;pointer-events:none}.center h1{font-size:68px;font-weight:900;letter-spacing:1px;text-shadow:0 3px 18px rgba(0,0,0,.9)}.center h1.crashed{color:#ff193c}.center p{font-size:20px;font-weight:800;margin-bottom:2px;letter-spacing:2px}.waitWrap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;text-align:center;display:none}.targetSvg{width:170px;height:170px;filter:drop-shadow(0 0 12px rgba(255,20,50,.6))}.waitBox{margin-top:8px;background:#181818;border:1px solid #2a2a2a;border-radius:12px;padding:10px 18px;display:inline-block}.waitBox small{color:#8a8a8a;font-size:10px;letter-spacing:1px}.waitBox.brandSmall{color:#444;font-size:11px;margin-top:3px}.controls{background:#070a1a;padding:8px;display:flex;flex-direction:column;gap:8px}.betRow{display:flex;gap:8px;background:#1a1a1a;border:1px solid #2b2b2b;border-radius:16px;padding:8px}.left{flex:1}.amtRow{display:flex;align-items:center;background:#000;border:1px solid #333;border-radius:24px;padding:4px 6px}.amtRow button{width:28px;height:28px;border-radius:50%;border:1px solid #444;background:#111;color:#fff;font-size:18px;line-height:1}.amtRow.v{flex:1;text-align:center;font-weight:800;font-size:14px}.qk{display:flex;gap:6px;margin-top:6px}.qk button{background:#272727;border:0;color:#999;font-size:11px;padding:4px 10px;border-radius:12px}.opts{display:flex;justify-content:space-between;margin-top:6px;color:#666;font-size:10px}.right{width:52%}.betBtn{width:100%;height:60px;border:0;border-radius:14px;font-weight:900;font-size:14px;color:#fff;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.4)}.betBtn.green{background:linear-gradient(180deg,#2ad166,#1a9c44);box-shadow:0 5px 0 #0d5a26}.betBtn.orange{background:#ff7d00;box-shadow:0 5px 0 #a34f00}.betBtn.yellow{background:#e6c200;color:#000;box-shadow:0 5px 0 #8a7400}.betBtn:disabled{opacity:.5}.foot{display:flex;justify-content:space-between;color:#555;font-size:10px;padding:2px 4px}
+.liveWrap{margin-top:10px;background:#070a1a;border-top:1px solid #1e2a4a;padding:10px}
+.liveTable{width:100%;border-collapse:collapse;font-size:11px}
+.liveTable th{color:#666;text-align:left;padding:6px 4px;border-bottom:1px solid #1e2a4a;font-size:10px}
+.liveTable td{padding:7px 4px;border-bottom:1px solid #121a2f}
+#fairModal{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:none;align-items:center;justify-content:center;padding:16px}
+#fairBox{background:#0f1430;border:1px solid #26326a;border-radius:16px;padding:16px;width:100%;max-width:380px}
+#fairBox h3{font-size:14px;margin-bottom:10px;color:#7aa0ff}
+.row{font-size:11px;margin:6px 0;word-break:break-all;color:#bbb}
+.row b{color:#fff}
+#fairBox button{margin-top:12px;width:100%;height:38px;border:0;border-radius:10px;background:#1e3ecf;color:#fff;font-weight:800}
+@media(max-width:700px){.game{height:380px}.center h1{font-size:54px}}
+.backBtn{background:#0f206e;border:1px solid #2a3a7a;color:#fff;width:32px;height:32px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+</style></head><body><div class="header"><div style="display:flex;align-items:center;gap:10px"><button class="backBtn" onclick="goBack()">‹</button><div class="logo"><span>Play55</span></div></div><div class="hdrRight"><span id="clock">10:24</span><span id="hdrUser">Demo ▼</span><span class="badge" id="balBadge">0 INN ●</span></div></div><div class="histRow" id="hist"><button class="fairBtn" onclick="openFair()">🛡️ FAIR</button></div><div class="game"><canvas id="c"></canvas>
+<div id="liveTop" style="position:absolute;top:8px;right:10px;z-index:5;background:rgba(0,0,0,0.60);border:1px solid #2a345a;padding:4px 10px;border-radius:14px;font-size:11px;font-weight:800;color:#fff;display:flex;align-items:center;gap:5px">
+<span style="width:7px;height:7px;background:#2cff6a;border-radius:50%;display:inline-block;box-shadow:0 0 6px #2cff6a"></span>
+<span id="liveTopCount">847</span> PLAYERS
+</div>
+<div class="center" id="center"><p id="flew" style="display:none">FLEW AWAY!</p><h1 id="mult">1.00x</h1></div><div class="waitWrap" id="waitWrap"><svg class="targetSvg" viewBox="0 0 200 200"><g transform="translate(100 100)"><circle r="68" fill="none" stroke="#ff1a1a" stroke-width="9" opacity="0.95"/><circle r="42" fill="none" stroke="#ff1a1a" stroke-width="9" opacity="0.85"/><circle r="16" fill="#ff1a1a"/><g id="planeTop"><path d="M0 -88 L12 -60 L9 -51 L16 -48 L0 -34 L-16 -48 L-9 -51 L-12 -60 Z M0 -34 L0 76 L7 86 L0 81 L-7 86 L0 76" fill="#ff1a1a"/></g></g></svg><div class="waitBox"><small>WAITING FOR THE NEXT ROUND</small><div class="brandSmall">Original Gambling Brand<br>SINCE 2017</div></div></div></div><div class="controls"><div class="betRow"><div class="left"><div class="amtRow"><button onclick="chg(1,-1)">−</button><div class="v" id="v1">10.00</div><button onclick="chg(1,1)">+</button></div><div class="qk"><button onclick="setV(1,10)">10</button><button onclick="setV(1,50)">50</button><button onclick="setV(1,100)">100</button><button onclick="setV(1,500)">500</button></div><div class="opts"><span>◉ Autoplay</span><span onclick="setAuto(1)" id="ac1Btn" style="cursor:pointer">Auto Cash Out <b id="ac1">2.00x</b> OFF</span></div></div><div class="right"><button class="betBtn green" id="b1" onclick="bet(1)">BET<br><span id="bv1">10.00 INN</span></button></div></div><div class="betRow"><div class="left"><div class="amtRow"><button onclick="chg(2,-1)">−</button><div class="v" id="v2">10.00</div><button onclick="chg(2,1)">+</button></div><div class="qk"><button onclick="setV(2,10)">10</button><button onclick="setV(2,50)">50</button><button onclick="setV(2,100)">100</button><button onclick="setV(2,500)">500</button></div><div class="opts"><span>◉ Autoplay</span><span onclick="setAuto(2)" id="ac2Btn" style="cursor:pointer">Auto Cash Out <b id="ac2">2.00x</b> OFF</span></div></div><div class="right"><button class="betBtn green" id="b2" onclick="bet(2)">BET<br><span id="bv2">10.00 INN</span></button></div></div><div class="foot"><span id="tb">Total Bets 0/0</span><span id="tw">Total Win 0.00</span></div>
+<div class="liveWrap">
+<table class="liveTable"><thead><tr><th>username</th><th>bet</th><th>x</th><th>win</th></tr></thead><tbody id="liveBody"></tbody></table>
+</div>
+</div>
+
+<div id="fairModal" onclick="if(event.target==this) closeFair()"><div id="fairBox">
+<h3>Provably Fair - Play55</h3>
+<div class="row"><b>Server Seed Hash (Next):</b><br><span id="fHash">-</span></div>
+<div class="row"><b>Server Seed (Last):</b><br><span id="fServer">-</span></div>
+<div class="row"><b>Client Seed:</b><br><span id="fClient">-</span></div>
+<div class="row"><b>Nonce:</b><br><span id="fNonce">-</span></div>
+<div class="row"><b>Last Crash:</b><br><span id="fCrash">-</span></div>
+<div class="row" style="color:#666;margin-top:8px;font-size:10px">Formula: crash = 0.90 / (1 - random). 10% instant 1.00x</div>
+<button onclick="closeFair()">CLOSE</button>
+</div></div>
+
+<script type="module">
+// === FIREBASE LIVE BALANCE ===
+import { db } from '../firebase.js';
+import { doc, getDoc, updateDoc, increment, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const username = (localStorage.getItem("play55_current_user")||"demo").toLowerCase();
+window.fbUsername = username;
+let fbCoins = 0;
+let fbLoaded = false;
+
+async function initFirebaseBalance(){
+  const ref = doc(db,"clients",username);
+  const snap = await getDoc(ref);
+  if(!snap.exists()){
+    document.getElementById("balBadge").textContent = "0 INN ●";
+    return;
+  }
+  const data = snap.data();
+  fbCoins = data.coins||0;
+  fbLoaded = true;
+  window.userBalance = fbCoins;
+  document.getElementById("balBadge").textContent = Math.floor(fbCoins)+" INN ●";
+  document.getElementById("hdrUser").textContent = data.username.toUpperCase()+" ▼";
+  // Live sync - admin coin add karega to turant update
+  onSnapshot(ref,(s)=>{
+    if(s.exists()){
+      const d=s.data();
+      fbCoins = d.coins||0;
+      window.userBalance = fbCoins;
+      document.getElementById("balBadge").textContent = Math.floor(fbCoins)+" INN ●";
+      localStorage.setItem("play55_balance",Math.floor(fbCoins));
+    }
+  });
+}
+
+window.syncBalanceToMain = async(newBal)=>{ /* local only */
+  localStorage.setItem("play55_balance", newBal);
+  document.getElementById("balBadge").textContent = Math.floor(newBal)+" INN ●";
+}
+
+window.fbDeduct = async(amt, reason)=>{
+  const now=new Date();
+  const ref=doc(db,"clients",username);
+  await updateDoc(ref,{
+    coins: increment(-amt),
+    history: arrayUnion({
+      date: now.toLocaleString("en-IN"),
+      day: now.toLocaleDateString("en-IN"),
+      iso: now.toISOString(),
+      time: now.toLocaleString(),
+      amount: amt,
+      type: "CUT",
+      reason: reason||"Aviator Bet",
+      ref: "BET-"+Date.now().toString().slice(-6),
+      balance: fbCoins-amt
+    })
+  });
+}
+window.fbAdd = async(amt, reason, crashVal)=>{
+  const now=new Date();
+  const ref=doc(db,"clients",username);
+  await updateDoc(ref,{
+    coins: increment(amt),
+    history: arrayUnion({
+      date: now.toLocaleString("en-IN"),
+      day: now.toLocaleDateString("en-IN"),
+      iso: now.toISOString(),
+      time: now.toLocaleString(),
+      amount: amt,
+      type: "ADD",
+      reason: reason||`Win ${crashVal}x`,
+      ref: "WIN-"+Date.now().toString().slice(-6),
+      balance: fbCoins+amt,
+      game: "AVIATOR",
+      crash: crashVal
+    })
+  });
+}
+
+initFirebaseBalance();
+</script>
+
+<script>
+function goBack(){ window.location.href='../index.html'; }
+const canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
+function rs(){let r=canvas.getBoundingClientRect();canvas.width=r.width*(window.devicePixelRatio||1);canvas.height=r.height*(window.devicePixelRatio||1);ctx.setTransform(window.devicePixelRatio||1,0,0,window.devicePixelRatio||1,0,0)}
+addEventListener('resize',rs);rs();
+let stars=[];for(let i=0;i<100;i++)stars.push({x:Math.random(),y:Math.random(),s:Math.random()*1.2+0.3,sp:0.01+Math.random()*0.02});
+let phase='waiting', mult=1, crash=2.34, t=0, path=[], plane={x:20,y:0}, raf, hist=[], canBet=true;
+let bets=[{amt:10,placed:false},{amt:10,placed:false}], startTime=0, lastCrash=2.34;
+let livePlayers=[];
+window.userBalance = parseInt(localStorage.getItem("play55_balance") || "1000");
+
+let autoCash=[2.0,2.0], autoOn=[false,false];
+
+function randStr(len=16){let c="abcdefghijklmnopqrstuvwxyz0123456789";let s="";for(let i=0;i<len;i++) s+=c[Math.floor(Math.random()*c.length)]; return s;}
+let serverSeed = localStorage.getItem('play55_serverSeed') || randStr(32);
+let clientSeed = localStorage.getItem('play55_clientSeed') || randStr(16);
+let nonce = parseInt(localStorage.getItem('play55_nonce')||'1');
+localStorage.setItem('play55_serverSeed',serverSeed);
+localStorage.setItem('play55_clientSeed',clientSeed);
+function seededRandom(str){
+  let h1=1779033703, h2=3144134277, h3=1013904242, h4=2773480762;
+  for(let i=0,k;i<str.length;i++){k=str.charCodeAt(i); h1=h2^Math.imul(h1^k,597399067); h2=h3^Math.imul(h2^k,2869860233); h3=h4^Math.imul(h3^k,951274213); h4=h1^Math.imul(h4^k,2716044179);}
+  h1=Math.imul(h3^(h1>>>18),597399067); h2=Math.imul(h4^(h2>>>22),2869860233); h3=Math.imul(h1^(h3>>>17),951274213); h4=Math.imul(h2^(h4>>>19),2716044179);
+  return (h1^h2^h3^h4)>>>0;
+}
+function simpleHash(str){ let h=2166136261; for(let i=0;i<str.length;i++){h^=str.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0; }
+function rndCrash(){
+  let seedStr = serverSeed + ":" + clientSeed + ":" + nonce;
+  let hashInt = seededRandom(seedStr);
+  let r = hashInt / 4294967295;
+  nonce++; localStorage.setItem('play55_nonce',nonce);
+  window._lastSeedStr = seedStr;
+  window._lastHash = simpleHash(seedStr).toString(16);
+  if(r < 0.10) return 1.00;
+  let cr = 0.90 / (1 - r);
+  if(cr > 100) cr = 100;
+  if(cr < 1) cr = 1.00;
+  return +cr.toFixed(2);
+}
+function openFair(){
+  document.getElementById('fairModal').style.display='flex';
+  document.getElementById('fHash').textContent = simpleHash(serverSeed + ":" + clientSeed + ":" + nonce).toString(16);
+  document.getElementById('fServer').textContent = window._lastSeedStr? window._lastSeedStr.split(':')[0] : serverSeed;
+  document.getElementById('fClient').textContent = clientSeed;
+  document.getElementById('fNonce').textContent = (nonce-1);
+  document.getElementById('fCrash').textContent = lastCrash + "x";
+}
+function closeFair(){ document.getElementById('fairModal').style.display='none'; }
+
+try{
+  let saved = localStorage.getItem('play55_hist_final');
+  if(saved){ hist = JSON.parse(saved); }
+  else { for(let i=0;i<20;i++) hist.push(rndCrash()); localStorage.setItem('play55_hist_final', JSON.stringify(hist)); }
+}catch(e){ for(let i=0;i<20;i++) hist.push(rndCrash()); }
+
+function drawHist(){
+  let h=document.getElementById('hist');let btn=h.querySelector('.fairBtn');h.innerHTML=''; if(btn) h.appendChild(btn); else {let b=document.createElement('button');b.className='fairBtn';b.textContent='🛡️ FAIR';b.onclick=openFair;h.appendChild(b);}
+  hist.slice(-20).reverse().forEach(v=>{
+    let d=document.createElement('div');d.className='hist '+(v>=2?'pink':'blue');
+    if(v>=20){d.style.background='#ff1a1a';d.style.color='#fff';}
+    d.textContent=v.toFixed(2);h.appendChild(d)
+  });
+  h.scrollLeft = 0;
+  try{ localStorage.setItem('play55_hist_final', JSON.stringify(hist)); }catch(e){}
+}
+drawHist();
+
+function simulateOfflineRounds(){
+  let lastTime = parseInt(localStorage.getItem('play55_lastActive') || '0');
+  let now = Date.now();
+  if(!lastTime){ localStorage.setItem('play55_lastActive', now); return {mode:'wait', waitLeft:5000}; }
+  let elapsed = now - lastTime;
+  if(elapsed < 2000) return {mode:'wait', waitLeft:5000};
+  let tempTime = elapsed;
+  let fakeCount = 0;
+  while(tempTime > 13000){
+    let c = rndCrash();
+    hist.push(c);
+    if(hist.length>40) hist.shift();
+    tempTime -= (5000 + (2000 + Math.random()*7000));
+    fakeCount++;
+    if(fakeCount>20) break;
+  }
+  if(fakeCount>0) drawHist();
+  if(tempTime < 5000){
+    return {mode:'wait', waitLeft: 5000 - tempTime};
+  } else {
+    let flyTime = (tempTime - 5000) / 1000;
+    let c = rndCrash();
+    let expectedCrashTime = Math.log(c)/Math.log(1.095)/2.05;
+    if(flyTime >= expectedCrashTime){
+      return {mode:'wait', waitLeft:1000};
+    }
+    return {mode:'flying', flyTime: flyTime, crash: c};
+  }
+}
+
+function draw(now){
+  let Wl=canvas.clientWidth, Hl=canvas.clientHeight;
+  ctx.clearRect(0,0,Wl,Hl);
+  let bg=ctx.createLinearGradient(0,0,0,Hl);bg.addColorStop(0,'#0c1233');bg.addColorStop(1,'#050814');ctx.fillStyle=bg;ctx.fillRect(0,0,Wl,Hl);
+  stars.forEach(s=>{ s.x-=s.sp; if(s.x<0){s.x=1; s.y=Math.random()} ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.fillRect(s.x*Wl, s.y*Hl, s.s, s.s); });
+  if(path.length>1){
+    ctx.beginPath();ctx.moveTo(0, Hl-10);path.forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(plane.x, plane.y);ctx.lineTo(plane.x, Hl);ctx.lineTo(0, Hl);ctx.closePath();ctx.fillStyle='rgba(200,10,35,0.85)';ctx.fill();
+    ctx.beginPath();ctx.moveTo(0, Hl-10);path.forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(plane.x,plane.y);ctx.strokeStyle='#ff0a1a';ctx.lineWidth=3.5;ctx.lineJoin='round';ctx.stroke();
+  }
+  if(phase!=='waiting'){
+    ctx.save();ctx.translate(plane.x,plane.y);ctx.rotate(-0.28 + Math.sin(now*0.002)*0.05);
+    ctx.fillStyle='#ff1a1a'; ctx.beginPath(); ctx.moveTo(-42,1);ctx.lineTo(-34,-9);ctx.lineTo(-26,-10);ctx.lineTo(-18,-3);ctx.lineTo(6,-7);ctx.lineTo(18,-9);ctx.lineTo(30,-7);ctx.lineTo(42,-3);ctx.lineTo(42,3);ctx.lineTo(30,7);ctx.lineTo(-4,9);ctx.lineTo(-26,11);ctx.lineTo(-34,10);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(22,-2,10,2.5,0,0,Math.PI*2);ctx.fill(); ctx.fillRect(-14,2,18,1.5);
+    ctx.save();ctx.translate(44,0);ctx.rotate(now*0.07);ctx.fillStyle='#ff1a1a';ctx.fillRect(-1,-16,2,32);ctx.restore(); ctx.restore();
+  }
+}
+function loop(now){
+  if(phase==='flying'){
+    let dt=(now-startTime)/1000; startTime=now; t+=dt;
+    mult=Math.pow(1.095, t*2.05);
+    if(mult>=crash){mult=crash; doCrash();}
+    else {
+      let Wl=canvas.clientWidth, Hl=canvas.clientHeight;
+      let maxX = Wl*0.60;
+           if(mult <= 3){let prog = (mult - 1) / 2;plane.x = 12 + prog*(maxX-12);plane.y = (Hl-10) - (prog*(Hl*0.50));}
+           else {plane.x = maxX + Math.sin(now*0.003)*4;plane.y = (Hl-10) - (Hl*0.50) + Math.sin(now*0.004)*5;}
+      path.push({x:plane.x,y:plane.y});if(path.length>600) path.shift();updateLiveCashouts();
+    }
+    document.getElementById('mult').textContent=mult.toFixed(2)+'x';
+    bets.forEach((b,i)=>{if(b.placed){let btn=document.getElementById('b'+(i+1));btn.innerHTML=`Cash Out<br><span>${(b.amt*mult).toFixed(2)} INN</span>`;}});
+  }
+  draw(now); raf=requestAnimationFrame(loop);
+}
+function doCrash(){
+  phase='crashed'; canBet=false; lastCrash=crash;
+  localStorage.setItem('play55_lastActive', Date.now());
+  document.getElementById('flew').style.display='block';
+  let m=document.getElementById('mult'); m.textContent=crash.toFixed(2)+'x'; m.className='crashed';
+  bets.forEach((b,i)=>{if(b.placed){b.placed=false; let btn=document.getElementById('b'+(i+1)); btn.className='betBtn green'; btn.disabled=true; btn.innerHTML=`BET<br><span>${b.amt.toFixed(2)} INN</span>`;}});
+  hist.push(crash); if(hist.length>40) hist.shift(); drawHist();
+  livePlayers.forEach(p=>{ if(!p.cashed) { p.x='-'; p.win='0'; } });
+  if(window.cashedCount < window.totalPlayers * 0.6){window.cashedCount = Math.floor(window.totalPlayers * (0.60 + Math.random()*0.35));}
+  renderLive();setTimeout(()=>{ startWait(); },1000);
+}
+function startWait(customWait){
+  localStorage.setItem('play55_lastActive', Date.now());
+  phase='waiting'; path=[]; plane={x:20,y:canvas.clientHeight-10};
+  document.getElementById('center').style.display='none';document.getElementById('waitWrap').style.display='block';canBet=true;
+  bets.forEach((_,i)=>{ let btn=document.getElementById('b'+(i+1)); btn.disabled=false; btn.className='betBtn green'; btn.innerHTML=`BET<br><span>${bets[i].amt.toFixed(2)} INN</span>`; });
+  window.totalPlayers = Math.floor(liveTopPlayers * 0.5) + Math.floor(Math.random()*100) + 80;
+  if(window.totalPlayers >= liveTopPlayers) window.totalPlayers = liveTopPlayers - Math.floor(Math.random()*120) - 50;
+  if(window.totalPlayers < 80) window.totalPlayers = 80 + Math.floor(Math.random()*100);
+  window.totalWinAmount = 0;window.cashedCount = 0;livePlayers=[];
+  for(let i=0;i<25;i++){
+    let name = String.fromCharCode(97+Math.floor(Math.random()*26)) + "***" + Math.floor(10+Math.random()*89);
+    let amt = Math.floor(50+Math.random()*8000);let rr = Math.random();let target;
+    if(rr < 0.50) target = 1.10 + Math.random()*1.40;else if(rr < 0.75) target = 2.51 + Math.random()*2.48;else if(rr < 0.90) target = 5.01 + Math.random()*4.99;else target = 10 + Math.random()*15;
+    target = +target.toFixed(2);livePlayers.push({name,amt,target,x:'-',win:'-',cashed:false});
+  }
+  livePlayers.sort((a,b)=>b.amt-a.amt);renderLive();
+  let rot=0; let iv=setInterval(()=>{rot+=8; let el=document.getElementById('planeTop'); if(el) el.setAttribute('transform',`rotate(${rot})`);},16);
+  let waitTime = customWait || 5000;
+  setTimeout(()=>{clearInterval(iv); document.getElementById('waitWrap').style.display='none'; document.getElementById('center').style.display='block'; startFly();}, waitTime);
+}
+function startFly(){
+  phase='flying'; t=0; mult=1; crash=rndCrash();
+  startTime=performance.now(); path=[]; plane={x:20,y:canvas.clientHeight-10};
+  document.getElementById('flew').style.display='none'; document.getElementById('mult').className='';
+  canBet=false;
+  bets.forEach((b,i)=>{if(b.placed){let btn=document.getElementById('b'+(i+1));btn.className='betBtn yellow'; btn.disabled=false;} else { let btn=document.getElementById('b'+(i+1)); btn.disabled=true; btn.textContent='BET LOCKED'; }});
+  raf=requestAnimationFrame(loop);
+}
+function updateLiveCashouts(){
+  let changed=false;
+  livePlayers.forEach(p=>{
+    if(!p.cashed && mult >= p.target && p.target < crash){
+      p.cashed=true; p.x=p.target.toFixed(2); p.win=(p.amt * p.target).toFixed(0);
+      window.cashedCount++;window.totalWinAmount += parseFloat(p.win);
+      let extra = Math.floor(Math.random()*2)+1;window.cashedCount += extra;window.totalWinAmount += extra * (300 + Math.random()*2500);
+      if(window.cashedCount > window.totalPlayers) window.cashedCount = Math.floor(window.totalPlayers * 0.95);changed=true;
+    }
+  });
+  if(mult >= 5 && window.cashedCount < window.totalPlayers * 0.70){window.cashedCount = Math.floor(window.totalPlayers * (0.70 + Math.random()*0.10));changed=true;}
+  if(bets[0].placed && autoOn[0] && mult >= autoCash[0]) bet(1);
+  if(bets[1].placed && autoOn[1] && mult >= autoCash[1]) bet(2);
+  if(changed) renderLive();
+}
+function renderLive(){
+  if(window.cashedCount > window.totalPlayers) window.cashedCount = Math.floor(window.totalPlayers * 0.95);
+  document.getElementById('tb').textContent = `Total Bets ${window.cashedCount}/${window.totalPlayers}`;
+  document.getElementById('tw').textContent = `Total Win ${window.totalWinAmount.toFixed(2)}`;
+  let tbody=document.getElementById('liveBody'); tbody.innerHTML='';
+  livePlayers.forEach(r=>{
+    let tr=document.createElement('tr');let color = r.x==='-'? '#888' : '#2cff6a';let xText = r.x==='-'? '-' : r.x+'x';
+    tr.innerHTML=`<td>${r.name}</td><td>${r.amt} INN</td><td style="color:${color}">${xText}</td><td>${r.win}</td>`;tbody.appendChild(tr);
+  });
+}
+function setAuto(n){
+  let i=n-1;let v=prompt('Auto Cash Out X daal (ex: 2.5)', autoCash[i]);
+  if(v){autoCash[i]=parseFloat(v);autoOn[i]=true;document.getElementById('ac'+n).textContent=autoCash[i].toFixed(2)+'x';document.getElementById('ac'+n+'Btn').innerHTML=`Auto Cash Out <b>${autoCash[i].toFixed(2)}x</b> <span style="color:#2ad166">ON</span>`;}
+  else {autoOn[i]=!autoOn[i];document.getElementById('ac'+n+'Btn').innerHTML=`Auto Cash Out <b>${autoCash[i].toFixed(2)}x</b> ${autoOn[i]? '<span style="color:#2ad166">ON</span>' : '<span style="color:#888">OFF</span>'}`;}
+}
+async function bet(n){
+  let i=n-1,b=bets[i],btn=document.getElementById('b'+n);
+  if(phase==='flying' && b.placed){
+    let win=b.amt*mult;
+    try{
+      await window.fbAdd(win,`Aviator Cashout ${mult.toFixed(2)}x`,mult.toFixed(2));
+      window.userBalance += win;
+      window.syncBalanceToMain(window.userBalance);
+    }catch(e){ console.log(e); }
+    b.placed=false;btn.className='betBtn green'; btn.disabled=true; btn.innerHTML=`BET<br><span>${b.amt.toFixed(2)} INN</span>`; window.cashedCount++; window.totalWinAmount+=win; renderLive(); return;
+  }
+  if(!b.placed){
+    if(!canBet){ return; }
+    if(window.userBalance < b.amt){ alert("Balance kam hai - Admin se Add karwao"); return; }
+    try{
+      await window.fbDeduct(b.amt, `Aviator Bet ${b.amt}`);
+      window.userBalance -= b.amt;
+      window.syncBalanceToMain(window.userBalance);
+    }catch(e){ alert("Firebase error: "+e.message); return; }
+    b.placed=true;btn.className='betBtn orange'; btn.innerHTML=`Waiting<br><span>${b.amt.toFixed(2)} INN</span>`;
+  } else {
+    // cancel before start - refund
+    try{
+      await window.fbAdd(b.amt, `Bet Cancel Refund`,0);
+      window.userBalance += b.amt;
+      window.syncBalanceToMain(window.userBalance);
+    }catch(e){}
+    b.placed=false; btn.className='betBtn green'; btn.innerHTML=`BET<br><span>${b.amt.toFixed(2)} INN</span>`;
+  }
+}
+function chg(n,d){let i=n-1; bets[i].amt=Math.max(10,bets[i].amt+d*10); document.getElementById('v'+n).textContent=bets[i].amt.toFixed(2); document.getElementById('bv'+n).textContent=bets[i].amt.toFixed(2)+' INN';}
+function setV(n,v){bets[n-1].amt=v; document.getElementById('v'+n).textContent=v.toFixed(2); document.getElementById('bv'+n).textContent=v.toFixed(2)+' INN';}
+let liveTopPlayers = 847;
+function updateLiveTop(){let change = Math.floor(Math.random()*80 - 35);liveTopPlayers += change;if(liveTopPlayers < 300) liveTopPlayers = 300 + Math.floor(Math.random()*100);if(liveTopPlayers > 2000) liveTopPlayers = 2000 - Math.floor(Math.random()*100);document.getElementById('liveTopCount').textContent = liveTopPlayers;}
+setInterval(updateLiveTop, 3000);updateLiveTop();
+setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})},1000);
+
+let offline = simulateOfflineRounds();
+if(offline.mode === 'flying'){
+  phase='flying'; t=offline.flyTime; mult=Math.pow(1.095, t*2.05); crash=offline.crash;
+  if(mult >= crash){ startWait(1000); }
+  else {
+    path=[]; plane={x:20,y:canvas.clientHeight-10};
+    let Wl=canvas.clientWidth, Hl=canvas.clientHeight;
+    let maxX = Wl*0.60;
+    if(mult <= 3){ let prog = (mult - 1) / 2; plane.x = 12 + prog*(maxX-12); plane.y = (Hl-10) - (prog*(Hl*0.50)); }
+    else { plane.x = maxX; plane.y = (Hl-10) - (Hl*0.50); }
+    startTime=performance.now();
+    document.getElementById('waitWrap').style.display='none';
+    document.getElementById('center').style.display='block';
+    document.getElementById('flew').style.display='none';
+    canBet=false;
+    bets.forEach((b,i)=>{ let btn=document.getElementById('b'+(i+1)); btn.disabled=true; btn.textContent='BET LOCKED'; });
+    raf=requestAnimationFrame(loop);
+  }
+} else {
+  startWait(offline.waitLeft);
+}
+</script></body></html>

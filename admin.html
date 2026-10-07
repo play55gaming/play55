@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=loops&utm_source=ai-legible&utm_medium=owned&utm_content=comment&utm_id=e907188c-f9db-4d22-89df-a3ab938e95d7
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Play55 - Super Admin Final - Firebase ALL CLEAR</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#e9eef5;color:#222}
+.header{background:#111827;color:#fff;padding:18px;font-size:22px;font-weight:bold;text-align:center;position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center}
+.container{max-width:1100px;margin:20px auto;padding:15px}
+.card{background:#fff;border-radius:12px;padding:18px;margin-bottom:18px;box-shadow:0 3px 12px rgba(0,0,0,.08)}
+.card h2{margin-bottom:15px;font-size:20px;color:#111827}
+.tabs{display:flex;gap:8px;margin-bottom:15px;overflow-x:auto;flex-wrap:wrap}
+.tab{padding:10px 18px;border-radius:8px;background:#e5e7eb;cursor:pointer;font-weight:bold;white-space:nowrap}
+.tab.active{background:#2563eb;color:#fff}
+input,select{width:100%;padding:12px;border:1px solid #ccd3dd;border-radius:8px;margin-bottom:10px;outline:none}
+button{border:0;padding:11px 16px;border-radius:8px;cursor:pointer;font-weight:bold;margin:4px}
+.addBtn{background:#16a34a;color:#fff}.saveBtn{background:#2563eb;color:#fff}.resetBtn{background:#6b7280;color:#fff}
+.editBtn{background:#f59e0b;color:#fff}.deleteBtn{background:#dc2626;color:#fff}.coinAdd{background:#059669;color:#fff}.coinCut{background:#dc2626;color:#fff}
+.match,.userRow{border:1px solid #dbe1e8;border-radius:10px;padding:15px;margin-bottom:12px}
+.status{padding:10px;border-radius:8px;background:#eef2ff;margin-bottom:15px;font-weight:bold}
+.hidden{display:none}
+.small{color:#666;font-size:13px}
+.badge{display:inline-block;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:bold;color:#fff}
+.badge-green{background:#16a34a}.badge-red{background:#dc2626}.badge-blue{background:#2563eb}.badge-gray{background:#6b7280}
+.history{max-height:280px;overflow-y:auto;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px;margin-top:10px}
+.hist-item{border-bottom:1px solid #e5e7eb;padding:8px 0;font-size:13px}
+.searchBox{display:flex;gap:8px}
+.searchBox input{flex:1}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px}
+@media(max-width:700px){.grid2{grid-template-columns:1fr}.grid4{grid-template-columns:1fr 1fr}}
+#adminLogin{position:fixed; inset:0; background:radial-gradient(circle at top, #1e293b, #020617); display:flex; justify-content:center; align-items:center; z-index:9999; padding:20px;}
+.loginBox{width:100%; max-width:400px; background:#fff; border-radius:16px; padding:25px; box-shadow:0 10px 30px rgba(0,0,0,.4); text-align:center;}
+.wrap{position:relative}
+.eye{position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; font-weight:bold; color:#2563eb; z-index:5; padding:5px;}
+.linkBtn{background:none;color:#2563eb;text-decoration:underline;font-size:13px;cursor:pointer;margin-top:8px;}
+.stat{padding:15px;border-radius:10px;color:#fff;text-align:center}
+.stat h3{font-size:28px}
+.filterBtn{padding:8px 12px;border-radius:20px;background:#e5e7eb;font-size:13px}
+.filterBtn.active{background:#111827;color:#fff}
+#toast.show{display:block !important; animation: slideDown 0.3s ease;}
+@keyframes slideDown{from{top:0; opacity:0} to{top:30px; opacity:1}}
+</style>
+</head>
+<body>
+<div id="toast" style="position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#16a34a;color:#fff;padding:14px 28px;border-radius:10px;z-index:99999;display:none;font-weight:bold;box-shadow:0 5px 20px rgba(0,0,0,0.4);text-align:center;"></div>
+<div id="adminLogin">
+  <div class="loginBox">
+    <h1>👑 Play55 ADMIN</h1>
+    <p class="small" style="margin:10px 0">Super Admin Login</p>
+    <input type="text" id="adminUser" value="aviatorgame128@gmail.com">
+    <div class="wrap">
+      <input type="password" id="adminPass" placeholder="Password">
+      <span class="eye" id="eyeIcon" onclick="togglePass()">👁️</span>
+    </div>
+    <button class="saveBtn" style="width:100%; margin-top:10px;" onclick="adminLogin()">Login</button>
+    <div style="margin-top:10px; display:flex; justify-content:space-between;">
+      <span class="linkBtn" onclick="forgotPass()">Forgot Password?</span>
+      <span class="linkBtn" onclick="toggleChangeBox()">Change Password</span>
+    </div>
+    <div id="changePassBox" class="hidden" style="margin-top:12px; border-top:1px solid #eee; padding-top:10px;">
+      <input type="password" id="newAdminPass" placeholder="New Password">
+      <button class="addBtn" style="width:100%" onclick="changeAdminPass()">Update Password</button>
+    </div>
+    <p id="loginErr" style="color:red; font-size:14px; margin-top:10px; font-weight:bold; min-height:20px;"></p>
+  </div>
+  </div>
+<div class="header"><span>PLAY55 - ADMIN FINAL</span><button class="deleteBtn" onclick="adminLogout()" style="font-size:14px">Logout</button></div>
+<div class="container">
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('dashboard')" id="tab-dashboard">📊 Dashboard</div>
+  <div class="tab" onclick="switchTab('users')" id="tab-users">👤 Create ID</div>
+  <div class="tab" onclick="switchTab('check')" id="tab-check">🔍 Check ID & Coins + Ref</div>
+  <div class="tab" onclick="switchTab('matches')" id="tab-matches">🏏 Matches</div>
+  <div class="tab" onclick="switchTab('settings')" id="tab-settings">⚙️ Settings</div>
+<div class="tab" onclick="switchTab('deposits')" id="tab-deposits">💰 Deposits</div>
+<div class="tab" onclick="switchTab('withdrawals')" id="tab-withdrawals">🏧 Withdrawals</div>
+</div>
+<div id="status" class="status">Firebase Ready | play55-fea54 | All Buttons Clickable</div>
+
+<div id="section-dashboard" class="card">
+  <h2>📊 Site Analytics</h2>
+  <div style="display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap">
+    <button class="filterBtn active" id="f-all" onclick="setFilter('all')">All Time</button>
+    <button class="filterBtn" id="f-24" onclick="setFilter('24h')">Last 24 Hour</button>
+    <button class="filterBtn" id="f-today" onclick="setFilter('today')">Today</button>
+    <button class="filterBtn" id="f-month" onclick="setFilter('month')">This Month</button>
+  </div>
+  <div class="grid4">
+    <div class="stat" style="background:#2563eb"><p>Total Visits</p><h3 id="stat-visits">0</h3></div>
+    <div class="stat" style="background:#16a34a"><p>Total ID Players</p><h3 id="stat-ids">0</h3></div>
+    <div class="stat" style="background:#f59e0b"><p>Demo Users</p><h3 id="stat-demo">0</h3></div>
+    <div class="stat" style="background:#111827"><p>Real Clients</p><h3 id="stat-real">0</h3></div>
+  </div>
+  <br>
+  <div class="grid2">
+    <div class="card" style="margin:0"><h2>Recent Visits</h2><div id="recentVisits" class="history"></div></div>
+    <div class="card" style="margin:0"><h2>Recent Registrations</h2><div id="recentRegs" class="history"></div></div>
+  </div>
+</div>
+
+<div id="section-users" class="card hidden">
+  <h2>Create New ID + WhatsApp OTP</h2>
+  <div class="grid2">
+    <input type="text" id="newMobile" placeholder="Mobile 91XXXXXXXXXX">
+    <input type="text" id="newUsername" placeholder="Username">
+    <input type="text" id="newPassword" value="Asdf@123">
+    
+  </div>
+  <button class="resetBtn" onclick="clearUserForm()">Clear</button>
+  <br>
+  <div class="grid2">
+    <input type="number" id="newCoins" placeholder="Opening Coins">
+    <input type="text" id="newRef" placeholder="Ref No / UTR">
+  </div>
+<button class="addBtn" onclick="createUser()">+ Create ID</button>
+  <br><br>
+<h2>All Users (<span id="userCount">0</span>)</h2>
+<div style="margin:10px 0; display:flex; gap:8px;">
+<button onclick="renderAllUsers('all')" class="saveBtn" style="padding:6px 14px;">All</button>
+<button onclick="renderAllUsers('manual')" class="addBtn" style="padding:6px 14px;">Manual</button>
+<button onclick="renderAllUsers('self')" class="editBtn" style="padding:6px 14px;">Self</button>
+</div>
+<div id="allUsersList">Loading...</div>
+</div>
+
+<div id="section-check" class="card hidden">
+  <h2>Check ID</h2>
+  <div class="searchBox">
+    <input type="text" id="searchId" placeholder="Username ya Mobile..." oninput="liveSearch()">
+    <button class="saveBtn" onclick="checkUser()">Search</button>
+  </div>
+  <div id="liveResults" style="margin-top:10px"></div>
+  <div id="checkedUserResult"></div>
+</div>
+
+<div id="section-matches" class="card hidden">
+  <h2>Match Control</h2>
+  <button class="addBtn" onclick="showAddForm()">+ Add Match</button>
+  <button class="resetBtn" onclick="resetMatches()">Reset Demo</button>
+  <br><br>
+  <div class="card hidden" id="matchForm" style="border:2px solid #2563eb">
+    <h2 id="formTitle">Add Match</h2>
+    <input type="hidden" id="editId">
+    <input type="text" id="matchName" placeholder="Match Name">
+    <div class="grid2"><input type="text" id="team1" placeholder="Team 1"><input type="text" id="team2" placeholder="Team 2"></div>
+    <div class="grid2">
+      <select id="matchSport"><option value="CRICKET">CRICKET</option><option value="FOOTBALL">FOOTBALL</option><option value="TENNIS">TENNIS</option><option value="CASINO">CASINO</option></select>
+      <select id="matchType"><option value="LIVE">LIVE</option><option value="UPCOMING">UPCOMING</option><option value="VIRTUAL">VIRTUAL</option><option value="PREMIUM">PREMIUM</option></select>
+    </div>
+    <div class="grid2">
+      <select id="matchCat"><option value="SPORTS">SPORTS</option><option value="PREMIUM">PREMIUM</option></select>
+      <select id="matchStatus"><option value="UPCOMING">UPCOMING</option><option value="LIVE">LIVE</option><option value="ENDED">ENDED</option></select>
+    </div>
+    <input type="text" id="matchTime" placeholder="Match Time">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <input type="text" id="odd0" placeholder="1"><input type="text" id="odd1" placeholder="X"><input type="text" id="odd2" placeholder="2">
+      <input type="text" id="odd3" placeholder="-"><input type="text" id="odd4" placeholder="-"><input type="text" id="odd5" placeholder="-">
+    </div><br>
+    <button class="saveBtn" onclick="saveMatch()">Save</button>
+    <button class="resetBtn" onclick="hideForm()">Cancel</button>
+  </div>
+  <div id="matchList"></div>
+</div>
+
+<div id="section-settings" class="card hidden">
+<h2>📞 Support Settings</h2>
+<input type="text" id="waDemo" placeholder="Demo Support Number" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid #ccd3dd;border-radius:8px;">
+<input type="text" id="waMain" placeholder="Main Support Number" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid #ccd3dd;border-radius:8px;">
+<button class="saveBtn" onclick="saveWhatsapp()">💾 Save WhatsApp Numbers</button>
+<p id="saveMsgWa" style="color:green;font-weight:bold;margin-top:8px;"></p>
+<hr style="margin:15px 0;">
+<h2>💳 QR & Payment Settings</h2>
+<label>QR 1 (Gallery se)</label>
+<input type="file" id="qr1File" accept="image/*">
+<img id="qr1Preview" style="width:100px;height:100px;object-fit:contain;border:1px solid #ddd;display:none;margin:5px 0;">
+<input type="text" id="qr1" placeholder="QR 1 auto link" readonly style="width:100%;padding:8px;background:#eee;">
+<label style="margin-top:10px;display:block;">QR 2 (Gallery se)</label>
+<input type="file" id="qr2File" accept="image/*">
+<img id="qr2Preview" style="width:100px;height:100px;object-fit:contain;border:1px solid #ddd;display:none;margin:5px 0;">
+<input type="text" id="qr2" placeholder="QR 2 auto link" readonly style="width:100%;padding:8px;background:#eee;">
+<input type="text" id="upiId" placeholder="UPI ID" style="width:100%;padding:12px;margin-top:10px;border:1px solid #ccd3dd;border-radius:8px;">
+<input type="text" id="bankName" placeholder="Bank Name" style="width:100%;padding:12px;margin-top:10px;border:1px solid #ccd3dd;border-radius:8px;">
+<input type="text" id="holderName" placeholder="Holder Name" style="width:100%;padding:12px;margin-top:10px;border:1px solid #ccd3dd;border-radius:8px;">
+<input type="text" id="accNumber" placeholder="A/C Number" style="width:100%;padding:12px;margin-top:10px;border:1px solid #ccd3dd;border-radius:8px;">
+<input type="text" id="ifscCode" placeholder="IFSC Code" style="width:100%;padding:12px;margin-top:10px;border:1px solid #ccd3dd;border-radius:8px;">
+<button class="saveBtn" onclick="saveQRSettings()" style="margin-top:12px;">💾 Save QR & Payment</button>
+<p id="saveMsgQr" style="color:green;font-weight:bold;margin-top:8px;"></p>
+</div>
+
+<div id="section-deposits" class="card hidden">
+  <h2>💰 Deposit Requests</h2>
+  <div id="depositRequestsList">Loading deposits...</div>
+</div>
+
+<div id="section-withdrawals" class="card hidden">
+  <h2>🏦 Withdrawal Requests</h2>
+  <div id="withdrawRequestsList">Loading withdrawals...</div>
+</div>
+</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, increment, arrayUnion, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCgdsWp2ickEEUCxQtwORZrvSQT_v6Uqds",
+  authDomain: "play55-fea54.firebaseapp.com",
+  projectId: "play55-fea54",
+  storageBucket: "play55-fea54.firebasestorage.app",
+  messagingSenderId: "462267275634",
+  appId: "1:462267275634:web:3f86b340d1c45464eda5eb"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+function showToast(m){const t=document.getElementById("toast");if(!t)return; t.innerText=m; let r=/cut|deduct|remove|error|fail|invalid/i.test(m); t.style.background=r?"#dc2626":"#16a34a"; t.style.display="block"; t.classList.add("show"); setTimeout(()=>{t.style.display="none";t.classList.remove("show")},2500);} window.alert=showToast;
+const ADMIN_EMAIL = "aviatorgame128@gmail.com";
+const DEFAULT_PASS="Asdf@123";
+let allUsersCache=[];
+let currentFilter='all';
+let generatedOtp = null;
+let otpMobile = null;
+const SETTINGS_REF = doc(db, "settings", "main");
+const defaultMatches=[{title:"Japan v India",sport:"CRICKET",type:"LIVE",cat:"SPORTS",date:"22/09/2026 09:30",status:"LIVE",odds:["170.00","960.00","-","-","-","1.01"]},{title:"Aviator Crash",sport:"CASINO",type:"PREMIUM",cat:"PREMIUM",date:"22/09/2026 12:00",status:"LIVE",odds:["1.95","-","-","-","-","-"]}];
+
+window.togglePass=()=>{let el=document.getElementById("adminPass"); let icon=document.getElementById("eyeIcon"); if(el.type==="password"){el.type="text"; icon.innerText="🙈";}else{el.type="password"; icon.innerText="👁️";}}
+window.toggleChangeBox=()=>{document.getElementById("changePassBox").classList.toggle("hidden");}
+function checkAdminSession(){let s=localStorage.getItem("play55_admin"); if(s==="logged_in"){document.getElementById("adminLogin").style.display="none";}}
+checkAdminSession();
+window.forgotPass=async()=>{let err=document.getElementById("loginErr"); try{await sendPasswordResetEmail(auth, ADMIN_EMAIL); err.style.color="green"; err.innerText="✅ Reset link bhej diya";}catch(e){err.style.color="red"; err.innerText="❌ "+e.message;}}
+window.changeAdminPass=async()=>{let np=document.getElementById("newAdminPass").value.trim(); let err=document.getElementById("loginErr"); if(!np||np.length<6){err.style.color="red"; err.innerText="❌ 6 char"; return;} try{await updatePassword(auth.currentUser, np); err.style.color="green"; err.innerText="✅ "+np;}catch(e){err.style.color="red"; err.innerText="❌ "+e.message;}}
+window.adminLogin=async ()=>{let u=document.getElementById("adminUser").value.trim(); let p=document.getElementById("adminPass").value.trim(); let err=document.getElementById("loginErr"); err.innerText="Checking..."; if(u.toLowerCase()!==ADMIN_EMAIL.toLowerCase()){err.innerText="❌ Sirf "+ADMIN_EMAIL; return;} try{await signInWithEmailAndPassword(auth,u,p); err.innerText="";}catch(e){err.innerText="❌ "+e.message;}}
+window.adminLogout=async()=>{try{await signOut(auth);}catch(e){} localStorage.removeItem("play55_admin"); location.reload();}
+onAuthStateChanged(auth,(user)=>{if(user && user.email.toLowerCase()===ADMIN_EMAIL.toLowerCase()){localStorage.setItem("play55_admin","logged_in"); document.getElementById("adminLogin").style.display="none"; loadDashboard(); loadSettings();}});
+window.sendWhatsAppOtp=async()=>{
+  const mobile=document.getElementById("newMobile").value.trim();
+  const status=document.getElementById("otpStatus");
+  if(!mobile || mobile.length<10){status.innerText="❌ Sahi mobile daalo"; return;}
+  generatedOtp = Math.floor(100000 + Math.random()*900000).toString();
+  otpMobile = mobile;
+  await setDoc(doc(db,"otp_verification",mobile),{otp:generatedOtp, mobile, time:new Date().toISOString()});
+  const msg = `Play55 OTP: ${generatedOtp}`;
+  const waLink = `https://wa.me/${mobile}?text=${encodeURIComponent(msg)}`;
+  status.innerHTML=`✅ OTP: <b>${generatedOtp}</b> - <a href="${waLink}" target="_blank">WhatsApp Open</a>`;
+}
+window.verifyOtpAndCreate=async()=>{
+  const entered=document.getElementById("newOtp").value.trim();
+  const mobile=document.getElementById("newMobile").value.trim();
+  const status=document.getElementById("otpStatus");
+  if(!generatedOtp){status.innerText="❌ Pehle OTP bhejo"; return;}
+  if(entered!==generatedOtp){status.innerText="❌ Galat OTP"; return;}
+  status.innerText="✅ Verified! Creating...";
+  await createUserInternal(true);
+}
+async function createUserInternal(isVerified=false){
+  const mobile=document.getElementById("newMobile").value.trim();
+  const username=document.getElementById("newUsername").value.trim().toLowerCase();
+  const password=document.getElementById("newPassword").value.trim()||DEFAULT_PASS;
+  const coins=parseInt(document.getElementById("newCoins").value)||0;
+  const ref=document.getElementById("newRef").value.trim()||"OPEN-"+Date.now().toString().slice(-6);
+  if(!mobile||!username){alert("Mobile, Username required");return;}
+  const docRef=doc(db,"clients",username);
+  const exists=await getDoc(docRef);
+  if(exists.exists()){alert("Username exists");return;}
+  const now=new Date();
+  await setDoc(docRef,{mobile, username, displayName:username, password, coins, source:'manual',isSuspended:false, mobileVerified:isVerified, isDemo:false, history:[{type:"ADD",amount:coins,reason:"Opening"+(isVerified?" Verified":""),ref,time:now.toLocaleString(),iso:now.toISOString(),date:now.toLocaleDateString("en-IN")}], createdAt:now.toISOString(), createdBy:ADMIN_EMAIL});
+setStatus(`Created: ${username}`); showToast(`ID Created - ${username}`); clearUserForm(); renderAllUsers(); loadDashboard();}
+window.createUser=()=>createUserInternal(false);
+window.createUserWithoutOtp=()=>createUserInternal(false);
+window.clearUserForm=()=>{["newMobile","newUsername","newCoins","newRef"].forEach(id=>{let el=document.getElementById(id); if(el) el.value="";}); document.getElementById("newPassword").value=DEFAULT_PASS; generatedOtp=null; let s=document.getElementById("otpStatus"); if(s) s.innerText="";}
+
+async function fetchUsers(){const snap=await getDocs(collection(db,"clients")); allUsersCache=snap.docs.map(d=>({id:d.id,...d.data()})); return allUsersCache;}
+window.renderAllUsers=async(filter='all')=>{
+currentFilter=filter;
+document.getElementById("allUsersList").innerHTML="Loading...";
+let users=await fetchUsers(); 
+let allCount = users.length;
+let manualCount = users.filter(u=>u.source==='manual').length;
+let selfCount = users.filter(u=>u.source==='self').length;
+
+if(filter==='manual') users=users.filter(u=>u.source==='manual');
+if(filter==='self') users=users.filter(u=>u.source==='self');
+
+document.getElementById("userCount").innerText = users.length + " ( All: "+allCount+" | Manual: "+manualCount+" | Self: "+selfCount+" )";
+document.getElementById("allUsersList").innerHTML=users.map(u=>`<div class="userRow"><b>${u.username}</b> - 🪙 ${u.coins} - ${u.mobile} ${u.mobileVerified?'✓':''}<br><button class="editBtn" onclick="quickSearch('${u.username}')">Check</button><button class="deleteBtn" onclick="deleteUser('${u.username}')">Delete</button></div>`).join("");}
+window.deleteUser=async(username)=>{if(!confirm("Delete?"))return; await deleteDoc(doc(db,"clients",username)); renderAllUsers(); loadDashboard();}
+window.quickSearch=(username)=>{switchTab('check'); document.getElementById("searchId").value=username; checkUser();}
+window.liveSearch=()=>{const q=document.getElementById("searchId").value.trim().toLowerCase(); const liveDiv=document.getElementById("liveResults"); if(!q){liveDiv.innerHTML="";return;} const filtered=allUsersCache.filter(u=>u.username.includes(q)||(u.mobile||"").includes(q)); liveDiv.innerHTML=filtered.slice(0,10).map(u=>`<div class="userRow" style="padding:8px;cursor:pointer" onclick="document.getElementById('searchId').value='${u.username}'; checkUser();"><b>${u.username}</b> - ${u.mobile}</div>`).join("");}
+window.checkUser=async()=>{
+const q=document.getElementById("searchId").value.trim().toLowerCase(); 
+if(!q){alert("Search likho");return;} 
+let user=allUsersCache.find(u=>u.username===q||u.mobile===q) || allUsersCache.find(u=>u.username.includes(q)); 
+const res=document.getElementById("checkedUserResult"); 
+if(!user){
+  res.innerHTML=`<p style="color:red">❌ Nahi mili: ${q}</p>`;
+  return;
+} 
+const hist=(user.history||[]).slice().reverse().map(h=>`
+  <div class="hist-item">
+    <span class="badge ${h.type==='ADD'?'badge-green':h.type==='CUT'?'badge-red':'badge-gray'}">${h.type}</span>
+    <b> ${h.amount!=0?('🪙 '+h.amount):''}</b> - ${h.reason} 
+    ${h.ref?`<br><span class="small"><b>Ref:</b> ${h.ref}</span>`:''}
+    <br><span class="small">⏰ ${h.time}</span>
+  </div>`).join("")||"<p class='small'>No history</p>"; 
+res.innerHTML=`
+<div class="userRow" style="border:2px solid #2563eb">
+  <div class="match-title">${user.username} ${user.isSuspended?'<span class="badge badge-red">SUSPENDED</span>':''}</div>
+  <div>Mobile: ${user.mobile}</div>
+  <div>Balance: <b style="font-size:22px">🪙 ${user.coins}</b></div>
+  <div class="small">Pass: ${user.password}</div>
+  <hr style="margin:12px 0">
+  <h3>💰 Add / Cut with Ref</h3>
+  <div class="grid2">
+    <input type="number" id="coinAmount" placeholder="Amount">
+    <input type="text" id="coinRef" placeholder="Ref No / UTR">
+  </div>
+  <input type="text" id="coinReason" placeholder="Reason (e.g. Deposit)">
+  <button class="coinAdd" onclick="addCoins('${user.username}')">+ Add Coin</button>
+  <button class="coinCut" onclick="cutCoins('${user.username}')">- Cut Coin</button>
+  <button class="${user.isSuspended?'addBtn':'deleteBtn'}" onclick="${user.isSuspended?`unsuspendUser('${user.username}')`:`suspendUser('${user.username}')`}">${user.isSuspended?'✅ Unblock':'⛔ Suspend'}</button>
+  <hr style="margin:12px 0">
+  <h3>🔑 Password Reset</h3>
+  <div class="searchBox">
+    <input type="text" id="newPassReset" value="${user.password}">
+    <button class="saveBtn" onclick="resetPassword('${user.username}')">Reset Pass</button>
+  </div>
+  <h3 style="margin-top:15px">📜 History (${(user.history||[]).length})</h3>
+  <div class="history">${hist}</div>
+</div>`;
+}
+window.addCoins=async(username)=>{
+const amt=parseInt(document.getElementById("coinAmount").value); 
+const ref=document.getElementById("coinRef").value.trim()||"ADD-"+Date.now().toString().slice(-6); 
+const reason=document.getElementById("coinReason").value.trim()||"Admin Add"; 
+if(!amt||amt<=0){alert("Amount daalo");return;} 
+const now=new Date(); 
+await updateDoc(doc(db,"clients",username),{coins:increment(amt),history:arrayUnion({type:"ADD",amount:amt,reason,ref,time:now.toLocaleString(),iso:now.toISOString(),date:now.toLocaleDateString()})}); 
+alert("Added "+amt); checkUser();
+}
+window.cutCoins=async(username)=>{
+const amt=parseInt(document.getElementById("coinAmount").value); 
+const ref=document.getElementById("coinRef").value.trim()||"CUT-"+Date.now().toString().slice(-6); 
+const reason=document.getElementById("coinReason").value.trim()||"Admin Cut"; 
+if(!amt||amt<=0){alert("Amount daalo");return;} 
+const now=new Date(); 
+await updateDoc(doc(db,"clients",username),{coins:increment(-amt),history:arrayUnion({type:"CUT",amount:amt,reason,ref,time:now.toLocaleString(),iso:now.toISOString(),date:now.toLocaleDateString()})}); 
+alert("Cut "+amt); checkUser();
+}
+window.suspendUser=async(username)=>{
+let reason=prompt("Suspend Reason:","Contact Admin"); if(reason===null) return; 
+const now=new Date(); 
+await updateDoc(doc(db,"clients",username),{isSuspended:true,suspendReason:reason,history:arrayUnion({type:"INFO",amount:0,reason:"SUSPENDED: "+reason,ref:"SUSPEND-"+Date.now().toString().slice(-5),time:now.toLocaleString(),iso:now.toISOString(),date:now.toLocaleDateString()})}); 
+alert("Suspended"); checkUser();
+}
+window.unsuspendUser=async(username)=>{
+const now=new Date(); 
+await updateDoc(doc(db,"clients",username),{isSuspended:false,suspendReason:"",history:arrayUnion({type:"INFO",amount:0,reason:"UNSUSPENDED",ref:"UNBLOCK-"+Date.now().toString().slice(-5),time:now.toLocaleString(),iso:now.toISOString(),date:now.toLocaleDateString()})}); 
+alert("Unblocked"); checkUser();
+}
+window.resetPassword=async(username)=>{
+const np=document.getElementById("newPassReset").value.trim(); 
+if(!np){alert("Password likho");return;} 
+const now=new Date(); 
+await updateDoc(doc(db,"clients",username),{password:np,history:arrayUnion({type:"INFO",amount:0,reason:`Pass Reset to ${np}`,ref:"PASS-"+Date.now().toString().slice(-5),time:now.toLocaleString(),iso:now.toISOString(),date:now.toLocaleDateString()})}); 
+alert("Password Reset to "+np); checkUser();
+}
+window.setFilter=(f)=>{currentFilter=f; document.querySelectorAll('.filterBtn').forEach(b=>b.classList.remove('active')); document.getElementById('f-'+f).classList.add('active'); loadDashboard();}
+window.loadDashboard=async()=>{
+  const users=await fetchUsers();
+  const visitsSnap=await getDocs(collection(db,"site_visits"));
+  let visits=visitsSnap.docs.map(d=>d.data());
+  let fVisits=visits, fUsers=users;
+  const now=new Date();
+  if(currentFilter==='today'){const today=now.toLocaleDateString('en-IN'); fVisits=visits.filter(v=> new Date(v.time).toLocaleDateString('en-IN')===today); fUsers=users.filter(u=> new Date(u.createdAt).toLocaleDateString('en-IN')===today);}
+  if(currentFilter==='24h'){const cut=Date.now()-86400000; fVisits=visits.filter(v=> new Date(v.time).getTime()>=cut); fUsers=users.filter(u=> new Date(u.createdAt).getTime()>=cut);}
+  if(currentFilter==='month'){const m=now.getMonth(), y=now.getFullYear(); fVisits=visits.filter(v=>{let d=new Date(v.time); return d.getMonth()===m && d.getFullYear()===y;}); fUsers=users.filter(u=>{let d=new Date(u.createdAt); return d.getMonth()===m && d.getFullYear()===y;});}
+  document.getElementById('stat-visits').innerText=fVisits.length; document.getElementById('stat-ids').innerText=fUsers.length; document.getElementById('stat-demo').innerText=users.filter(u=>u.isDemo).length; document.getElementById('stat-real').innerText=users.filter(u=>u.mobileVerified).length;
+  document.getElementById('recentVisits').innerHTML=visits.slice(-20).reverse().map(v=>`<div class="hist-item">${v.time}</div>`).join('')||"No visits - index.html me logger lagao";
+  document.getElementById('recentRegs').innerHTML=users.slice(-20).reverse().map(u=>`<div class="hist-item"><b>${u.username}</b> - ${u.mobile}</div>`).join('');
+}
+window.switchTab=(t)=>{document.querySelectorAll(".tab").forEach(e=>e.classList.remove("active")); document.getElementById("tab-"+t).classList.add("active"); ["dashboard","users","check","matches","settings","deposits","withdrawals"].forEach(x=>document.getElementById("section-"+x).classList.add("hidden")); document.getElementById("section-"+t).classList.remove("hidden"); if(t==='dashboard') loadDashboard();
+if(t==='deposits') loadDeposits();
+if(t==='withdrawals') loadWithdrawals();}
+
+window.loadDeposits = async()=>{
+  const listDiv = document.getElementById("depositRequestsList");
+  listDiv.innerHTML = "Loading...";
+  const snap = await getDocs(collection(db,"deposits"));
+  if(snap.empty){ listDiv.innerHTML="<p>No deposit requests</p>"; return; }
+  listDiv.innerHTML = snap.docs.map(d=>{
+    const data = d.data();
+    const isApproved = data.status === 'approved';
+    const isRejected = data.status === 'rejected';
+    let statusBadge = isApproved ? '<span class="badge badge-green">APPROVED</span>' : isRejected ? '<span class="badge badge-red">REJECTED</span>' : '<span class="badge badge-blue">PENDING</span>';
+    
+    return `<div class="userRow" style="border:2px solid ${isApproved?'#16a34a':'#dbe1e8'}">
+      <b>${data.username}</b> - ₹${data.amount} - UTR: <b>${data.utr}</b> ${statusBadge}<br>
+      <span class="small">${data.time || ''}</span><br>
+      ${data.slipUrl ? `<a href="${data.slipUrl}" target="_blank"><img src="${data.slipUrl}" style="width:200px; height:200px; object-fit:contain; border:1px solid #ddd; margin-top:8px; cursor:zoom-in;"></a><br><span class="small">Click image to zoom</span><br>` : '<span style="color:red">No Slip</span><br>'}
+      ${!isApproved && !isRejected ? `<button class="coinAdd" onclick="approveDeposit('${d.id}','${data.username}',${data.amount},'${data.utr}')">Approve</button> <button class="coinCut" onclick="rejectDeposit('${d.id}')">Reject</button>` : `<b>Already ${data.status}</b>`}
+      ${data.rejectReason ? `<br><span class="small" style="color:red"><b>Reason:</b> ${data.rejectReason}</span>` : ''}
+    </div>`;
+  }).join("");
+}
+
+window.approveDeposit = async(id,username,amount,utr)=>{
+  if(!confirm("Approve ₹"+amount+" for "+username+"?")) return;
+  const depRef = doc(db,"deposits",id);
+  const depSnap = await getDoc(depRef);
+  if(!depSnap.exists() || depSnap.data().status === 'approved'){
+    alert("Already Approved hai!"); loadDeposits(); return;
+  }
+  const q = query(collection(db,"deposits"), where("utr","==",utr), where("status","==","approved"));
+  const dupSnap = await getDocs(q);
+  if(!dupSnap.empty){
+    alert("DUPLICATE UTR! Ye UTR pehle use ho chuka hai: "+utr); return;
+  }
+  const now = new Date();
+  await updateDoc(doc(db,"clients",username),{
+    coins: increment(amount),
+    history: arrayUnion({type:"ADD", amount:amount, reason:"Deposit Approved", ref: utr || id, time: now.toLocaleString(), iso: now.toISOString(), date: now.toLocaleDateString("en-IN")})
+  });
+  await updateDoc(depRef,{status:"approved", approvedAt: now.toISOString()});
+  showToast("Approved ₹"+amount); loadDeposits();
+}
+window.rejectDeposit = async(id)=>{
+  let reason = prompt("Reject Reason likho (Client ko dikhega):", "UTR not found / Slip unclear");
+  if(reason === null) return;
+  await updateDoc(doc(db,"deposits",id),{status:"rejected", rejectReason: reason, rejectedAt: new Date().toISOString()});
+  showToast("Rejected: "+reason); loadDeposits();
+}
+window.loadWithdrawals = async()=>{
+  const listDiv = document.getElementById("withdrawRequestsList");
+  listDiv.innerHTML = "Loading...";
+  const snap = await getDocs(collection(db,"withdrawals"));
+  if(snap.empty){ listDiv.innerHTML="<p>No withdrawal requests</p>"; return; }
+  listDiv.innerHTML = snap.docs.map(d=>{
+    const data = d.data();
+    const status = data.status || 'pending';
+    
+    let buttons = '';
+    if(status === 'pending'){
+      buttons = `<input id="utr-${d.id}" placeholder="Enter UTR"><br>
+      <button class="coinAdd" id="btn-${d.id}" onclick="approveWithdraw('${d.id}')">Approve</button> 
+      <button class="coinCut" onclick="rejectWithdraw('${d.id}')">Reject</button>`;
+    } else if(status === 'approved'){
+      buttons = `<span style="color:green;font-weight:bold;">✓ Approved - UTR: ${data.utr || ''}</span>`;
+    } else {
+      buttons = `<span style="color:red;font-weight:bold;">✗ Rejected</span>`;
+    }
+
+    return `<div class="userRow"><b>${data.username}</b> - ₹${data.amount}<br>Acc: ${data.accNo} IFSC: ${data.ifsc}<br>Status: ${status}<br>${buttons}</div>`;
+  }).join("");
+}
+window.approveWithdraw = async(id)=>{
+  const utr = document.getElementById("utr-"+id).value.trim();
+  if(!utr){ alert("UTR daalo"); return; }
+  await updateDoc(doc(db,"withdrawals",id),{status:"approved", utr: utr});
+  alert("Withdrawal Approved!"); loadWithdrawals();
+}
+window.rejectWithdraw = async(id)=>{
+  await updateDoc(doc(db,"withdrawals",id),{status:"rejected"});
+  loadWithdrawals();
+}
+window.setStatus=(m)=>document.getElementById("status").innerText=m;
+window.esc=(v)=>String(v||'').replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+// ---- MATCHES & SETTINGS - FINAL FIXED ----
+async function getMatches(){try{const snap=await getDoc(doc(db,"settings","main")); if(snap.exists() && snap.data().matches) return snap.data().matches;}catch(e){} return defaultMatches;}
+async function saveMatches(m){await setDoc(doc(db,"settings","main"),{matches:m},{merge:true});}
+
+window.renderMatches=async()=>{
+  const ms=await getMatches();
+  const list=document.getElementById("matchList");
+  if(!list) return;
+  list.innerHTML=ms.map((match,i)=>`<div class="match"><b>${match.title}</b> - ${match.status}<br><button class="editBtn" onclick="editMatch(${i})">Edit</button><button class="deleteBtn" onclick="deleteMatch(${i})">Delete</button></div>`).join("");
+}
+window.showAddForm=()=>{document.getElementById("matchForm")?.classList.remove("hidden");}
+window.hideForm=()=>document.getElementById("matchForm")?.classList.add("hidden");
+window.saveMatch=async()=>{
+  const name=document.getElementById("matchName")?.value?.trim();
+  if(!name){alert("Match name daalo"); return;}
+  const ms=await getMatches();
+  ms.push({title:name,date:document.getElementById("matchTime")?.value||"",sport:document.getElementById("matchSport")?.value||"CRICKET",type:document.getElementById("matchType")?.value||"LIVE",cat:document.getElementById("matchCat")?.value||"SPORTS",status:document.getElementById("matchStatus")?.value||"LIVE",odds:[0,1,2,3,4,5].map(i=>document.getElementById("odd"+i)?.value||"-")});
+  await saveMatches(ms); renderMatches(); hideForm();
+}
+window.editMatch=async(i)=>{const ms=await getMatches(); const m=ms[i]; document.getElementById("matchForm")?.classList.remove("hidden"); document.getElementById("editId").value=i; document.getElementById("matchName").value=m.title;}
+window.deleteMatch=async(i)=>{if(!confirm("Delete?")) return; const ms=await getMatches(); ms.splice(i,1); await saveMatches(ms); renderMatches();}
+window.resetMatches=async()=>{await saveMatches(defaultMatches); renderMatches();};
+
+async function compressAndUpload(file){
+  if(!file) return "";
+  const img = await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=URL.createObjectURL(file);});
+  const c=document.createElement("canvas"); let w=img.width,h=img.height; const max=600;
+  if(w>h){if(w>max){h*=max/w;w=max;}}else{if(h>max){w*=max/h;h=max;}}
+  c.width=w;c.height=h; c.getContext("2d").drawImage(img,0,0,w,h);
+  return c.toDataURL("image/jpeg",0.6);
+}
+
+document.getElementById("qr1File")?.addEventListener("change",async e=>{
+  const url=await compressAndUpload(e.target.files[0]);
+  document.getElementById("qr1Preview").src=url;
+  document.getElementById("qr1Preview").style.display="block";
+  document.getElementById("qr1").value=url;
+  showToast("QR1 Selected - Save dabao");
+});
+document.getElementById("qr2File")?.addEventListener("change",async e=>{
+  const url=await compressAndUpload(e.target.files[0]);
+  document.getElementById("qr2Preview").src=url;
+  document.getElementById("qr2Preview").style.display="block";
+  document.getElementById("qr2").value=url;
+  showToast("QR2 Selected - Save dabao");
+});
+
+window.saveWhatsapp = async()=>{
+  try{
+    await setDoc(doc(db,"settings","main"),{
+      waDemo: document.getElementById("waDemo")?.value || "",
+      waMain: document.getElementById("waMain")?.value || ""
+    },{merge:true});
+    document.getElementById("saveMsgWa").innerText="✅ WhatsApp Saved!";
+    showToast("WhatsApp Saved!");
+    setTimeout(()=>document.getElementById("saveMsgWa").innerText="",3000);
+  }catch(e){alert("Error: "+e.message)}
+}
+window.saveQRSettings = async()=>{
+  try{
+    await setDoc(doc(db,"settings","main"),{
+      qr1: document.getElementById("qr1")?.value || "",
+      qr2: document.getElementById("qr2")?.value || "",
+      upiId: document.getElementById("upiId")?.value || "",
+      bankName: document.getElementById("bankName")?.value || "",
+      holderName: document.getElementById("holderName")?.value || "",
+      accNumber: document.getElementById("accNumber")?.value || "",
+      ifscCode: document.getElementById("ifscCode")?.value || ""
+    },{merge:true});
+    document.getElementById("saveMsgQr").innerText="✅ QR Saved!";
+    showToast("QR Saved!");
+    setTimeout(()=>document.getElementById("saveMsgQr").innerText="",3000);
+  }catch(e){alert("Error: "+e.message)}
+}
+
+window.loadSettings = async()=>{try{
+    const snap = await getDoc(doc(db,"settings","main"));
+    if(!snap.exists()) return;
+    const d = snap.data();
+    document.getElementById("waDemo").value = d.waDemo || "";
+    document.getElementById("waMain").value = d.waMain || "";
+    document.getElementById("qr1").value = d.qr1 || "";
+    document.getElementById("qr2").value = d.qr2 || "";
+    document.getElementById("upiId").value = d.upiId || "";
+    document.getElementById("bankName").value = d.bankName || "";
+    document.getElementById("holderName").value = d.holderName || "";
+    document.getElementById("accNumber").value = d.accNumber || "";
+    document.getElementById("ifscCode").value = d.ifscCode || "";
+    if(d.qr1){ document.getElementById("qr1Preview").src=d.qr1; document.getElementById("qr1Preview").style.display="block"; }
+    if(d.qr2){ document.getElementById("qr2Preview").src=d.qr2; document.getElementById("qr2Preview").style.display="block"; }
+  }catch(e){ console.log(e) }
+}
+checkAdminSession(); renderAllUsers(); loadDashboard(); loadSettings(); renderMatches();
+</script>
+</body>
+</html>

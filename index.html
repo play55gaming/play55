@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0">
+<title>Play55 - Online Sports Betting, Casino & Aviator Game</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#f3f6fb;color:#fff;overflow-x:hidden;max-width:100vw}
+:root{--gold:#ffcc00;--dark:#000d14}
+body{background: radial-gradient(ellipse at top, #ffffff 0%, #e8edf5 45%, #d9e2f0 100%) fixed!important; color:#111827;}
+body::before{content:''; position:fixed; inset:0; background-image: radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px); background-size: 22px 22px; pointer-events:none; z-index:-1;}
+#loader{position:fixed;inset:0;background:rgba(255,255,255,.92);z-index:9999;display:none;align-items:center;justify-content:center;flex-direction:column;color:#111;font-weight:900}
+.ldr{width:48px;height:48px;border:5px solid #111;border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loginPage{min-height:100vh;background:radial-gradient(circle at top, #1a2a35 0%, #000d14 70%);display:flex;justify-content:center;align-items:center;padding:20px}
+.loginBox{width:100%;max-width:595px;background:#0f1f28;border-radius:16px;padding:28px 22px 25px;box-shadow:0 8px 30px rgba(0,0,0,.6);border:1px solid #1a3340}
+.brandLogin{text-align:center;margin-bottom:35px}
+.brandLogin span{font-size:58px;font-weight:900;font-style:italic;color:var(--gold);text-shadow:0 0 15px rgba(255,204,0,.6),2px 3px 0 #a66a00;letter-spacing:1px;border:2px solid var(--gold);padding:5px 18px;border-radius:8px;background:linear-gradient(#1a0e00,#000)}
+.loginTitle{text-align:center;font-size:28px;margin-bottom:20px;color:#fff;font-weight:900}
+.field{width:100%;border:1px solid #1e3a4a;background:#0a171e;color:#fff;border-radius:10px;padding:15px 18px;font-size:16px;outline:none;margin-bottom:12px}
+.forgot{display:block;text-align:center;color:var(--gold);font-size:14px;margin:5px 0 20px;cursor:pointer;text-decoration:underline}
+.loginBtn,.demoBtn,.registerBtn{width:100%;border:0;border-radius:12px;padding:14px;color:#000;background:var(--gold);font-size:16px;font-weight:900;margin-bottom:10px;cursor:pointer;box-shadow:0 4px 15px rgba(255,204,0,.3)}
+.demoBtn{background:#13252e;color:#fff;border:1px solid #1e3a4a}
+.registerBtn{background:#00c853;color:#fff}
+.loginText{text-align:center;font-size:14px;margin:12px 0 18px;color:#7a95a3}
+.loginText span{color:var(--gold);text-decoration:underline;cursor:pointer}
+.whatsappBtn,.shareBtn{width:100%;padding:14px;border-radius:12px;font-size:14px;font-weight:900;margin-top:10px;cursor:pointer;border:0}
+.whatsappBtn{background:#25D366;color:white}
+.shareBtn{background:transparent;border:1px solid var(--gold);color:var(--gold)}
+#registerPage{display:none;min-height:100vh;background:radial-gradient(circle at top, #1a2a35 0%, #000d14 70%);padding:30px 18px}
+.registerBox{max-width:600px;margin:auto;background:#0f1f28;border-radius:16px;padding:25px;border:1px solid #1a3340}
+.registerLogo{text-align:center;font-size:42px;font-weight:900;font-style:italic;color:var(--gold);text-shadow:0 0 15px rgba(255,204,0,.6);margin-bottom:25px;border:2px solid var(--gold);display:inline-block;padding:5px 18px;border-radius:8px;background:linear-gradient(#1a0e00,#000);width:100%}
+.registerBox h2{text-align:center;margin-bottom:20px;color:#fff}
+.otpRow{display:flex;gap:8px}.otpRow input{flex:1}
+.otpBtn{background:var(--gold);color:#000;border:0;border-radius:10px;padding:0 15px;font-weight:900}
+#mainPage{display:none;background:transparent;min-height:100vh}
+.top{background:linear-gradient(90deg, #000d14, #101f2a, #000d14);color:white;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;border-bottom:2px solid #d4af37; box-shadow:0 4px 20px rgba(212,175,55,0.22)}
+.logo{display:flex;align-items:center;gap:6px;font-size:20px;font-weight:900;font-style:italic;letter-spacing:1px}
+.logo span{color:var(--gold);text-shadow:0 0 10px rgba(255,204,0,.5);border:1px solid var(--gold);padding:2px 10px;border-radius:4px;background:linear-gradient(#1a0e00,#000)}
+.userArea{display:flex;align-items:center;gap:6px}
+.balance{background:#0e2a12;border:1px solid #1a5a25;border-radius:20px;padding:5px 10px;font-weight:800;font-size:11px;display:flex;align-items:center;gap:4px;color:#eaffea}
+.usernameBox{background:#13252e;border:1px solid #1e3a4a;color:#fff;border-radius:20px;padding:5px 10px;font-weight:900;font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer}
+.bonusBtn{background:var(--gold);color:#000;border-radius:20px;padding:5px 10px;font-weight:900;font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer}
+#userMenuOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:40;display:none}
+#userMenu{position:fixed;top:52px;right:0;width:90%;max-width:360px;background:#0f1f28;z-index:41;display:none;max-height:calc(100vh - 52px);overflow-y:auto;box-shadow:-4px 0 20px rgba(0,0,0,.6);border-left:1px solid #1a3340;color:#fff}
+.subPage{display:none;background:#070f13;min-height:calc(100vh - 52px);padding:14px;color:#fff}
+.tbl{width:100%;border-collapse:collapse;margin-top:10px}.tbl th,.tbl td{border:1px solid #1a3340;padding:8px;font-size:12px;text-align:left}.tbl th{background:#000d14;color:var(--gold)}
+.ticker{display:flex;gap:8px;overflow-x:auto;background:rgba(255,255,255,0.85);padding:10px;scroll-snap-type:x mandatory;border-bottom:1px solid #e5e7eb}.ticker::-webkit-scrollbar{height:0}
+.match-card{min-width:235px;background:linear-gradient(180deg,#ffffff,#eef2f7);color:#111827;border-radius:12px;padding:10px;font-weight:bold;font-size:13px;border:1px solid #dbe1e8;scroll-snap-align:start}
+.tabs{background:#ffffff;color:#111827;display:flex;overflow-x:auto;white-space:nowrap;padding:10px 8px;font-weight:bold;position:sticky;top:52px;z-index:9;gap:8px;scroll-snap-type:x mandatory;border-bottom:1px solid #e5e7eb}.tabs::-webkit-scrollbar{height:0}
+.tabs span{padding:7px 16px;border-radius:20px;background:#e5e7eb;border:1px solid #d1d5db;color:#6b7280;cursor:pointer;font-size:12px;flex:0 0 auto}.tabs span.active{background:var(--gold);color:#000;border-color:var(--gold);box-shadow:0 3px 10px rgba(255,204,0,.4)}
+.sports{background:#ffffff;color:#111827;display:flex;gap:12px;overflow-x:auto;padding:12px;text-align:center;border-bottom:1px solid #e5e7eb}.sports::-webkit-scrollbar{height:0}
+.sport{min-width:75px;font-weight:bold;cursor:pointer;opacity:0.6;transition:.2s;font-size:12px;color:#111827}.sport.active{opacity:1;transform:scale(1.05);color:#111827}.sportIcon{font-size:32px;margin-bottom:4px}
+.filters{background:#ffffff;display:flex;gap:6px;padding:10px 8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid #e5e7eb;color:#111827}
+.pill{border:1px solid #d1d5db;border-radius:20px;background:#f3f4f6;padding:6px 12px;font-size:12px;font-weight:bold;cursor:pointer;color:#6b7280}.pill.active{background:#111827;color:#fff;border-color:#111827}
+.view{margin-left:auto;font-weight:bold;display:flex;align-items:center;gap:5px;font-size:12px;color:#6b7280}.view select{background:var(--gold);color:#000;border:0;padding:8px 12px;border-radius:20px;font-weight:900}
+.match-list{background:transparent;min-height:100px}
+.match-item{padding:10px 8px;border-bottom:1px solid #e5e7eb;cursor:pointer;background:#ffffff;margin:6px;border-radius:12px;border:1px solid #e5e7eb;color:#111827}
+.odds{display:grid;grid-template-columns:repeat(6,1fr);text-align:center;font-weight:bold;margin-top:8px;gap:4px}
+.blue{background:#dbeafe;color:#1d4ed8;padding:8px 2px;border-radius:8px;font-size:12px}.pink{background:#fee2e2;color:#b91c1c;padding:8px 2px;border-radius:8px;font-size:12px}
+.gameSectionTitle{background:#ffffff;color:#111827;padding:14px 12px;font-size:18px;font-weight:900;border-bottom:1px solid #e5e7eb;border-left:4px solid #d4af37;letter-spacing:.5px}
+.games{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px;background:transparent}
+.game{position:relative;overflow:hidden;cursor:pointer;border-radius:16px;aspect-ratio:0.82;width:100%;background:#fff;display:block;border:1px solid #e5e7eb;box-shadow:0 8px 20px rgba(0,0,0,.08);transition:.2s}
+.game:active{transform:scale(.96)}
+.gameIcon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;background:radial-gradient(circle at 30% 30%, #f3f4f6, #e5e7eb)}
+.gameIcon img{width:100%;height:100%;object-fit:cover;display:block}
+.gameText{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent, rgba(0,0,0,0.85));padding:22px 6px 8px;color:white;font-size:11px;font-weight:900;text-align:center;z-index:2;text-shadow:0 1px 3px #000}
+.launch{background:#ffffff;color:#111827;padding:14px 12px;font-size:18px;font-weight:900;border-top:1px solid #e5e7eb}
+.launchGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:10px;background:transparent}
+.launchCard{height:110px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px;color:white;font-weight:900;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 8px 20px rgba(0,0,0,.08)}
+.waFloat{position:fixed;bottom:85px;right:12px;background:#25D366;color:white;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:99;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2);border:2px solid #fff}
+.emptyBox{padding:40px 20px;text-align:center;color:#6b7280}
+.royal-top-actions{display:flex; gap:8px; padding:8px 10px; background: rgba(255,255,255,0.9); border-bottom:1px solid #e5e7eb;}
+.royal-action{flex:1; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; gap:6px; font-weight:900; font-size:13px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.08); border:1px solid; letter-spacing:0.5px; transition:0.15s;}
+.royal-action:active{transform:scale(0.97)}
+.royal-action.deposite{background: linear-gradient(90deg, #065f46, #10b981); border-color:#059669; color:#fff;}
+.royal-action.withdraw{background: linear-gradient(90deg, #7f1d1d, #ef4444); border-color:#dc2626; color:#fff;}
+.tbl{width:100%;border-collapse:collapse;background:#111827;border-radius:12px;overflow:hidden}
+.tbl th{background:#1f2937;color:#9ca3af;font-size:12px;padding:12px;text-align:left;letter-spacing:0.5px}
+.tbl td{padding:12px;border-top:1px solid #1f2937;font-size:13px;color:#e5e7eb}
+.tbl tr:hover td{background:#1e293b}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800}
+.badge.approved{background:#052e16;color:#22c55e;border:1px solid #16a34a}
+.badge.pending{background:#451a03;color:#facc15;border:1px solid #eab308}
+.badge.rejected{background:#450a0a;color:#ef4444;border:1px solid #dc2626}
+</style>
+</head>
+<body>
+<div id="loader"><div class="ldr"></div><div style="margin-top:12px">Loading Play55...</div></div>
+<section id="loginPage">
+  <div class="loginBox">
+    <div class="brandLogin"><span>Play55</span></div>
+    <div class="loginTitle">LOGIN 👤</div>
+    <input id="loginUser" class="field" placeholder="Enter Username or Mobile">
+    <div style="display:flex;align-items:center;background:#0a171e;border:1px solid #1e3a4a;border-radius:10px;margin-bottom:12px">
+      <input id="loginPass" class="field" type="password" placeholder="Password" style="border:0;margin:0;flex:1;background:transparent">
+      <span onclick="var i=document.getElementById('loginPass'); i.type=i.type=='password'?'text':'password'; this.textContent=i.type=='password'?'👁️':'🙈'" style="padding:0 15px;font-size:22px;cursor:pointer;user-select:none">👁️</span>
+    </div>
+    <div class="forgot" onclick="forgotPassword()">Forgot password</div>
+    <button class="loginBtn" onclick="loginUser()">Login ➜</button>
+    <button class="demoBtn" onclick="demoLogin()">Demo Login ➜</button>
+    <div class="loginText">Don't have an account? <span onclick="showRegister()">Sign Up</span></div>
+    <button class="whatsappBtn" onclick="openSupport('demo')">🟢 Contact On WhatsApp</button>
+    <button class="shareBtn" onclick="shareSite()">🔗 Share This APK With Friends</button>
+  </div>
+</section>
+<section id="registerPage">
+  <div class="registerBox">
+    <div class="registerLogo">Play55</div>
+    <h2>Create Account</h2>
+    <input id="regName" class="field" placeholder="Full Name">
+    <input id="regMobile" class="field" placeholder="Mobile Number" maxlength="15">
+    <input id="regUsername" class="field" placeholder="Username">
+    <input id="regPassword" class="field" type="password" placeholder="Password">
+    <div class="otpRow"><input id="regOtp" class="field" placeholder="Demo OTP"><button class="otpBtn" onclick="sendDemoOTP()">Get OTP</button></div>
+    <button class="registerBtn" onclick="registerUser()">Create Account</button>
+    <button class="demoBtn" onclick="showLogin()" style="margin-top:10px">Back To Login</button>
+    <p id="otpMessage" style="text-align:center;margin-top:12px;color:#ffcc00;font-weight:bold"></p>
+  </div>
+</section>
+<section id="mainPage">
+  <div class="top"><div class="logo">☰ <span>Play55</span></div>
+    <div class="userArea">
+      <div class="balance">🪙 <span id="balanceValue">0</span></div>
+      <div class="usernameBox" onclick="toggleUserMenu()"><span id="topUsername">DEMO123</span> <span id="menuArrow">▼</span></div>
+      <div class="bonusBtn" onclick="toggleUserMenu()">🎁 Bonus</div>
+    </div>
+  </div>
+  <div id="userMenuOverlay" onclick="toggleUserMenu()"></div>
+  <div id="userMenu">
+    <div style="background:#b4002a;color:#fff;text-align:center;padding:14px;font-weight:900">HI, <span id="menuUsername">DEMO123</span></div>
+    <div style="padding:12px 16px;font-size:14px;line-height:26px;border-bottom:1px solid #1a3340">
+      <div style="display:flex;justify-content:space-between"><span>Wallet Amount</span><b id="mWallet">0.00</b></div>
+      <div style="font-size:10px;color:#7a95a3">(Inclusive bonus)</div>
+      <div style="display:flex;justify-content:space-between"><span>Net Exposure</span><b id="mExposure">0.00</b></div>
+      <div style="display:flex;justify-content:space-between"><span>Bonus</span><b id="mBonus">1000.00</b></div>
+      <div style="display:flex;justify-content:space-between"><span>Available Withdrawal</span><b id="mAvail">0.00</b></div>
+    </div>
+    <div style="padding:10px 16px;display:flex;flex-direction:column;gap:8px;border-bottom:2px solid #122a33">
+      <div style="border:1px solid #b4002a;border-radius:20px;padding:8px;text-align:center;color:#ff6a6a;font-weight:900">AWAITING BONUS <span id="mAwait">1000</span></div>
+      <div style="background:#b4002a;border-radius:20px;padding:8px;text-align:center;color:#fff;font-weight:900">REFER AND EARN</div>
+    </div>
+    <div style="line-height:48px">
+      <div style="padding:0 16px;border-bottom:1px solid #122a33;cursor:pointer" onclick="goHome()">🏠 Home</div>
+      <div style="padding:0 16px;border-bottom:1px solid #122a33;cursor:pointer" onclick="openMyProfile()">👤 My Profile</div>
+      <div style="padding:0 16px;border-bottom:1px solid #122a33;cursor:pointer" onclick="openStatement()">📄 Account Statement</div>
+      <div style="padding:0 16px;border-bottom:1px solid #122a33;cursor:pointer" onclick="openChangePass()">🔒 Change Password</div>
+    </div>
+    <div onclick="logout()" style="background:linear-gradient(#e65100,#b4002a);color:#fff;text-align:center;padding:14px;font-weight:900;cursor:pointer">↪ SIGN OUT</div>
+  </div>
+  <div id="homeContent">
+    <div class="royal-top-actions">
+      <div class="royal-action deposite" onclick="openDeposit()">💚 DEPOSITE</div>
+      <div class="royal-action withdraw" onclick="openWithdraw()">❤️ WITHDRAWAL</div>
+    </div>
+    <div class="ticker" id="ticker"></div>
+    <div class="tabs" id="mainTabs">
+      <span data-filter="INPLAY" class="active" onclick="filterTabs('INPLAY',this)">INPLAY</span>
+      <span data-filter="SPORTS" onclick="filterTabs('SPORTS',this)">SPORTS</span>
+      <span data-filter="CASINO" onclick="filterTabs('CASINO',this)">CASINO</span>
+      <span data-filter="BOOK" onclick="filterTabs('BOOK',this)">SPORTS BOOK</span>
+      <span data-filter="OTHERS" onclick="filterTabs('OTHERS',this)">OTHERS</span>
+      <span data-filter="MULTI" onclick="filterTabs('MULTI',this)">MULTI MARKET</span>
+    </div>
+    <div class="sports" id="sportsFilter">
+      <div class="sport active" data-sport="ALL" onclick="filterSports('ALL',this)"><div class="sportIcon">🏏</div>ALL</div>
+      <div class="sport" data-sport="CRICKET" onclick="filterSports('CRICKET',this)"><div class="sportIcon">🏏</div>CRICKET</div>
+      <div class="sport" data-sport="FOOTBALL" onclick="filterSports('FOOTBALL',this)"><div class="sportIcon">⚽</div>FOOTBALL</div>
+      <div class="sport" data-sport="TENNIS" onclick="filterSports('TENNIS',this)"><div class="sportIcon">🎾</div>TENNIS</div>
+    </div>
+    <div class="filters">
+      <span class="pill active" data-pill="ALL" onclick="filterPill('ALL',this)">- ALL</span>
+      <span class="pill" data-pill="LIVE" onclick="filterPill('LIVE',this)">- LIVE</span>
+      <span class="pill" data-pill="VIRTUAL" onclick="filterPill('VIRTUAL',this)">- VIRTUAL</span>
+      <span class="pill" data-pill="PREMIUM" onclick="filterPill('PREMIUM',this)">- PREMIUM</span>
+      <div class="view">View by: <select><option>TIME</option></select></div>
+    </div>
+    <div class="match-list" id="matchList"></div>
+    <div class="gameSectionTitle">GAMES - Single Click to Play</div>
+    <div class="games">
+      <div class="game" style="border:2px solid #00ff88" onclick="openGame('avia')">
+        <div class="gameIcon"><img src="images/avia-lite-hd.webp"></div>
+        <div class="gameText">AVIA LITE</div>
+      </div>
+      <div class="game" onclick="openGame('crash')">
+        <div class="gameIcon"><img src="images/crash.webp"></div>
+        <div class="gameText">Crash 2.45x</div>
+      </div>
+      <div class="game" onclick="openGame('aviator')">
+        <div class="gameIcon"><img src="images/aviator-hd.webp"></div>
+        <div class="gameText">AVIATOR</div>
+      </div>
+      <div class="game" onclick="openGame('chicken')">
+        <div class="gameIcon"><img src="images/chicken.webp"></div>
+        <div class="gameText">CHICKEN ROAD 3D</div>
+      </div>
+      <div class="game" onclick="openGame('mines')">
+        <div class="gameIcon"><img src="images/mines-hd.webp"></div>
+        <div class="gameText">MINES</div>
+      </div>
+      <div class="game" onclick="openGame('plinko')">
+        <div class="gameIcon"><img src="images/plinko.webp"></div>
+        <div class="gameText">PLINKO</div>
+      </div>
+    </div>
+    <div class="launch">NEW LAUNCH</div>
+    <div class="launchGrid"><div class="launchCard" style="background:linear-gradient(135deg,#3b135e,#e58a00)">🎲 ANT GAMES</div><div class="launchCard" style="background:linear-gradient(135deg,#10204e,#ec7d19)">🐓 24h GAME</div></div>
+  </div>
+  <div id="profilePage" class="subPage">
+    <h3>👤 My Profile <span style="float:right;cursor:pointer" onclick="goHome()">✖</span></h3><br>
+    <div>UserID: <b id="pUserId"></b></div><div>Name: <b id="pName"></b></div><div>Available Coin: <b id="pAvail"></b></div><div>Exposure: <b id="pExp"></b></div><div>Total Coin: <b id="pTotal"></b></div><div>Bonus: <b id="pBonus"></b></div><hr style="margin:12px 0;border-color:#1a3340">
+    <h4>Change Password</h4>
+    <input id="oldPass" class="field" type="password" placeholder="Old Password">
+    <input id="newPass" class="field" type="password" placeholder="New Password">
+    <button class="loginBtn" onclick="changePassword()">Update Password</button>
+    <button class="shareBtn" onclick="goHome()">Back to Home</button>
+  </div> 
+<div id="statementPage" class="subPage">
+    <h3>📄 Statement <span style="float:right;cursor:pointer" onclick="goHome()">✖</span></h3>
+    <div style="display:flex;gap:8px;margin:12px 0">
+      <button onclick="showStmt('bet')" id="tabBet" style="flex:1;padding:10px;border-radius:20px;background:var(--gold);color:#000;font-weight:900;border:0">Bets</button>
+      <button onclick="showStmt('dw')" id="tabDW" style="flex:1;padding:10px;border-radius:20px;background:#13252e;color:#fff;border:1px solid #1e3a4a">Deposit / Withdraw</button>
+    </div>
+    <div id="statementList" style="margin-top:10px"></div>
+    <div id="dwList" style="margin-top:10px;display:none"></div>
+    <br><button class="shareBtn" onclick="goHome()">Back to Home</button>
+</div>
+<div class="waFloat" onclick="openSupport('main')"><div style="font-size:28px">💬</div></div>
+</section>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, doc, getDoc, setDoc, addDoc, getDocs, query, where, updateDoc, increment, arrayUnion, onSnapshot, serverTimestamp } from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyCgdsWp2ickEEUCxQtwORZrvSQT_v6Uqds",
+  authDomain: "play55-fea54.firebaseapp.com",
+  projectId: "play55-fea54",
+  storageBucket: "play55-fea54.firebasestorage.app",
+  messagingSenderId: "462267275634",
+  appId: "1:462267275634:web:3f86b340d1c45464eda5eb"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// --- VISIT LOGGER ---
+try {
+  await setDoc(doc(db, "site_visits", Date.now().toString()), {
+    time: new Date().toISOString(),
+    page: location.pathname,
+    ua: navigator.userAgent.slice(0, 100)
+  });
+} catch(e) {}
+
+// ... tera baki ka code
+const SETTINGS_REF = doc(db, "settings", "main");
+const DEFAULT_PASSWORD="Asdf@12";
+let currentFilter={tab:'INPLAY',sport:'ALL',pill:'ALL'};
+let currentUser=null;
+let cachedSettings={waDemo:"",waMain:"",waDeposite:"",waWithdrawal:""};
+let cachedMatches=[];
+const defaultMatches=[
+ {title:"Man City vs Arsenal",date:"22/09/2026 11:00",sport:"CRICKET",type:"LIVE",cat:"SPORTS",odds:["2.10","3.20","2.80","-","-","-"]},
+ {title:"Aviator Crash",date:"22/09/2026 12:00",sport:"CASINO",type:"PREMIUM",cat:"PREMIUM",odds:["1.95","-","-","-","-","-"]},
+];
+window.showLoader=(v)=>document.getElementById('loader').style.display=v?'flex':'none';
+window.getSettings=()=> cachedSettings;
+async function loadSettingsFirebase(){
+  try{
+    const snap=await getDoc(SETTINGS_REF);
+    if(snap.exists()){
+      const d=snap.data();
+      cachedSettings={waDemo:d.waDemo||"",waMain:d.waMain||"",waDeposite:d.waDeposite||"",waWithdrawal:d.waWithdrawal||""};
+    }
+  }catch(e){}
+  return cachedSettings;
+}
+function getMatches(){ return cachedMatches.length? cachedMatches : defaultMatches; }
+async function loadMatchesFirebase(){
+  try{
+    const snap=await getDoc(SETTINGS_REF);
+    if(snap.exists() && snap.data().matches){ cachedMatches=snap.data().matches; }
+    else { cachedMatches=defaultMatches; }
+  }catch(e){ cachedMatches=defaultMatches; }
+  return cachedMatches;
+}
+async function fetchClientByUsername(username){
+  const ref=doc(db,"clients",username.toLowerCase());
+  const snap=await getDoc(ref);
+  if(snap.exists()) return {id:snap.id,...snap.data()};
+  return null;
+}
+async function fetchClientByMobile(mobile){
+  const q=query(collection(db,"clients"),where("mobile","==",mobile));
+  const snap=await getDocs(q);
+  if(!snap.empty) return {id:snap.docs[0].id,...snap.docs[0].data()};
+  return null;
+}
+window.getCurrentUserObj=()=> currentUser;
+window.updateBalance=async(delta, desc)=>{
+  if(!currentUser) return;
+  const now=new Date();
+  const userRef=doc(db,"clients",currentUser.username);
+  const amt=Math.abs(delta);
+  const type=delta>=0?'CREDIT':'DEBIT';
+  await updateDoc(userRef,{
+    coins: increment(delta),
+    exposure: delta<0? increment(amt) : increment(0),
+    history: arrayUnion({
+      date: now.toLocaleString("en-IN"),
+      iso: now.toISOString(),
+      amount: amt,
+      type: type,
+      ref: 'REF'+Date.now().toString().slice(-6),
+      balance: (currentUser.coins||0)+delta,
+      desc: desc||'',
+      time: now.toLocaleString(),
+      day: now.toLocaleDateString("en-IN")
+    })
+  });
+  currentUser.coins=(currentUser.coins||0)+delta;
+  if(delta<0) currentUser.exposure=(currentUser.exposure||0)+amt;
+  document.getElementById("balanceValue").innerText=Math.floor(currentUser.coins);
+  localStorage.setItem("play55_balance",Math.floor(currentUser.coins));
+  refreshMenuData();
+}
+function getDisplayName(u){ if(!u) return "DEMO123"; return u.username.toUpperCase(); }
+window.toggleUserMenu=()=>{
+  let m=document.getElementById("userMenu"); let o=document.getElementById("userMenuOverlay");
+  let isOpen=m.style.display==="block";
+  m.style.display=isOpen?"none":"block"; o.style.display=isOpen?"none":"block";
+  document.getElementById("menuArrow").innerText=isOpen?"▼":"▲";
+  if(!isOpen) refreshMenuData();
+}
+window.refreshMenuData=()=>{
+  let u=currentUser; if(!u) return;
+  let disp=getDisplayName(u);
+  document.getElementById("topUsername").innerText=disp;
+  document.getElementById("menuUsername").innerText=disp;
+  document.getElementById("balanceValue").innerText=Math.floor(u.coins||0);
+  document.getElementById("mWallet").innerText=Math.floor(u.coins||0)+".00";
+  document.getElementById("mExposure").innerText=Math.floor(u.exposure||0)+".00";
+  document.getElementById("mBonus").innerText=(u.bonus||1000)+".00";
+  document.getElementById("mAvail").innerText=Math.floor(u.coins||0)+".00";
+  document.getElementById("mAwait").innerText=(u.bonus||1000);
+}
+window.goHome=()=>{ document.getElementById("userMenu").style.display="none"; document.getElementById("userMenuOverlay").style.display="none"; document.getElementById("profilePage").style.display="none"; document.getElementById("statementPage").style.display="none"; document.getElementById("homeContent").style.display="block"; renderMatches(); }
+window.openMyProfile=()=>{
+  let u=currentUser; if(!u) return;
+  document.getElementById("userMenu").style.display="none"; document.getElementById("userMenuOverlay").style.display="none";
+  document.getElementById("homeContent").style.display="none"; document.getElementById("statementPage").style.display="none"; document.getElementById("profilePage").style.display="block";
+  document.getElementById("pUserId").innerText=getDisplayName(u); document.getElementById("pName").innerText=u.displayName||u.username;
+  document.getElementById("pAvail").innerText=Math.floor(u.coins||0); document.getElementById("pExp").innerText=Math.floor(u.exposure||0);
+  document.getElementById("pTotal").innerText=Math.floor((u.coins||0)+(u.exposure||0)); document.getElementById("pBonus").innerText=(u.bonus||1000);
+}
+window.openStatement=()=>{
+  let u=currentUser;
+  document.getElementById("userMenu").style.display="none"; document.getElementById("userMenuOverlay").style.display="none";
+  document.getElementById("homeContent").style.display="none"; document.getElementById("profilePage").style.display="none"; document.getElementById("statementPage").style.display="block";
+  let hist=u.history||[]; if(hist.length===0){ document.getElementById("statementList").innerHTML="<div class='emptyBox'>No transactions yet</div>"; return; }
+  let html=`<table class="tbl"><tr><th>Date</th><th>Amount</th><th>Balance</th><th>Type</th><th>Ref</th><th>Reason</th></tr>`;
+  hist.slice().reverse().forEach(h=>{ html+=`<tr><td>${h.date||h.time} ${h.day||''}</td><td>${h.amount}</td><td>${h.balance}</td><td>${h.type}</td><td>${h.ref||''}</td><td>${h.desc||h.reason||''}</td></tr>`; }); html+=`</table>`;
+  document.getElementById("statementList").innerHTML=html;
+}
+window.showStmt=(type)=>{
+  document.getElementById('statementList').style.display=type==='bet'?'block':'none';
+  document.getElementById('dwList').style.display=type==='dw'?'block':'none';
+  document.getElementById('tabBet').style.background=type==='bet'?'var(--gold)':'#13252e';
+  document.getElementById('tabDW').style.background=type==='dw'?'var(--gold)':'#13252e';
+  if(type==='dw') loadDWStatement();
+}
+window.loadDWStatement=async()=>{
+  const box=document.getElementById('dwList'); box.innerHTML='Loading...';
+  try{
+    const depQ=query(collection(db,'deposits'),where('username','==',currentUser.username));
+    const wdQ=query(collection(db,'withdrawals'),where('username','==',currentUser.username));
+    const [depSnap, wdSnap]=await Promise.all([getDocs(depQ), getDocs(wdQ)]);
+    let all=[];
+depSnap.forEach(d=>{let D=d.data(); all.push({type:'DEPOSIT (Site)', amount:D.amount, status:D.status, time:D.time, _t:D.createdAt?.toMillis?.()||new Date(D.time).getTime()||0})});
+wdSnap.forEach(d=>{let D=d.data(); all.push({type:'WITHDRAW (Site)', amount:D.amount, status:D.status, time:D.time, _t:D.createdAt?.toMillis?.()||new Date(D.time).getTime()||0})});
+(currentUser.history||[]).forEach(h=>{ let s=(h.desc||'').toLowerCase();
+      if(s.includes('deposit')||s.includes('coin add')||s.includes('admin')) all.push({type:'DEPOSIT (Admin)', amount:h.amount, status:'approved', time:h.time||h.date, _t:new Date(h.iso||0).getTime()});
+    });
+    all.sort((a,b)=>b._t-a._t);
+if(!all.length){box.innerHTML="<div class='emptyBox'>No deposit/withdraw yet</div>";return;}
+let html=`<table class="tbl"><tr><th>TYPE</th><th>AMOUNT</th><th>STATUS</th><th>TIME</th></tr>`;
+all.forEach(r=>{
+  let st=(r.status||'pending').toLowerCase();
+  let cls=st==='approved'?'approved':st==='rejected'?'rejected':'pending';
+  let t=new Date(r._t).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+  let icon=r.type.includes('DEPOSIT')?'💰':'💸';
+  html+=`<tr><td style="font-weight:700">${icon} ${r.type}</td><td style="font-weight:800">₹${r.amount}</td><td><span class="badge ${cls}">${st.toUpperCase()}</span></td><td style="color:#9ca3af;font-size:12px">${t}</td></tr>`;
+});
+box.innerHTML=html+`</table>`;
+  }catch(e){box.innerHTML=e.message}
+}
+window.openChangePass=()=> openMyProfile();
+window.filterTabs=(val,el)=>{ currentFilter.tab=val; document.querySelectorAll('#mainTabs span').forEach(s=>s.classList.remove('active')); el.classList.add('active'); renderMatches(); }
+window.filterSports=(val,el)=>{ currentFilter.sport=val; document.querySelectorAll('#sportsFilter.sport').forEach(s=>s.classList.remove('active')); el.classList.add('active'); renderMatches(); }
+window.filterPill=(val,el)=>{ currentFilter.pill=val; document.querySelectorAll('.pill').forEach(s=>s.classList.remove('active')); el.classList.add('active'); renderMatches(); }
+window.renderMatches=()=>{
+  const ticker=document.getElementById("ticker"); const matchList=document.getElementById("matchList"); if(!ticker||!matchList) return;
+  let matches=getMatches();
+  let filtered=matches.filter(m=>{
+    if(currentFilter.sport!=='ALL' && m.sport!==currentFilter.sport) return false;
+    if(currentFilter.pill!=='ALL' && m.type!==currentFilter.pill) return false;
+    if(currentFilter.tab==='INPLAY'){ if(m.type!=='LIVE' && m.status!=='LIVE') return false; }
+    return true;
+  });
+  ticker.innerHTML=filtered.map(m=>`<div class="match-card">🏏 ${m.title}<br><span style="background:#07943d;padding:3px 7px;border-radius:4px;margin-top:6px;display:inline-block;font-size:11px;color:#fff;">${m.date}</span></div>`).join("") || "<div class='match-card'>No matches</div>";
+  if(filtered.length===0){ matchList.innerHTML=`<div class="emptyBox"><b>No matches found</b></div>`; return; }
+  matchList.innerHTML=filtered.map(m=>`<div class="match-item" onclick="placeBet('${m.title.replace(/'/g,"")}')"><div style="font-weight:800;display:flex;justify-content:space-between"><span>${m.title}</span><span style="color:#b45309">${m.cat||''}</span></div><div style="color:#ef4444;font-size:11px;margin-top:4px">${m.date}</div><div class="odds"><div class="blue">${m.odds[0]}</div><div class="pink">${m.odds[1]}</div><div class="blue">${m.odds[2]}</div><div class="pink">${m.odds[3]}</div><div class="blue">${m.odds[4]}</div><div class="pink">${m.odds[5]}</div></div></div>`).join("");
+}
+window.placeBet=async(title)=>{ if(confirm(title+" pe 100 coins lagau?")){ if(!currentUser || currentUser.coins<100){showToast("Balance kam hai");return;} await updateBalance(-100,'Bet on '+title); showToast("Bet placed on "+title); } }
+window.openGame=(type)=>{
+  if(!currentUser){ showToast("Login karo"); return; }
+  localStorage.setItem("play55_balance", Math.floor(currentUser.coins));
+  localStorage.setItem("play55_current_user", currentUser.username);
+  if(type=='avia') location.href='games/avia.html';
+  else if(type=='aviator') location.href='games/aviator.html';
+  else if(type=='crash') location.href='games/crash.html';
+  else if(type=='chicken') location.href='games/chicken-road.html';
+  else if(type=='mines') location.href='games/mines.html';
+  else if(type=='plinko') location.href='games/plinko.html';
+  else if(type=='wheel') location.href='games/wheel.html';
+  else showToast(type+" game jaldi aayega");
+}
+window.showLogin=()=>{document.getElementById("loginPage").style.display="flex";document.getElementById("registerPage").style.display="none";document.getElementById("mainPage").style.display="none";}
+window.showRegister=()=>{document.getElementById("loginPage").style.display="none";document.getElementById("registerPage").style.display="block";document.getElementById("mainPage").style.display="none";}
+window.showMainPage=async(user)=>{
+  currentUser=user;
+  document.getElementById("loginPage").style.display="none";document.getElementById("registerPage").style.display="none";document.getElementById("mainPage").style.display="block";document.getElementById("homeContent").style.display="block";
+  document.getElementById("balanceValue").innerText=Math.floor(user.coins||0);
+  localStorage.setItem("play55_balance", Math.floor(user.coins||0));
+  localStorage.setItem("play55_current_user", user.username);
+  await loadSettingsFirebase();
+  await loadMatchesFirebase();
+  refreshMenuData(); renderMatches();
+  onSnapshot(doc(db,"clients",user.username),(snap)=>{
+    if(snap.exists()){
+      currentUser={id:snap.id,...snap.data()};
+      document.getElementById("balanceValue").innerText=Math.floor(currentUser.coins||0);
+      localStorage.setItem("play55_balance",Math.floor(currentUser.coins||0));
+      refreshMenuData();
+    }
+  });
+  onSnapshot(SETTINGS_REF,(snap)=>{
+    if(snap.exists()){
+      const d=snap.data();
+      if(d.matches) { cachedMatches=d.matches; renderMatches(); }
+      cachedSettings={waDemo:d.waDemo||"",waMain:d.waMain||"",waDeposite:d.waDeposite||"",waWithdrawal:d.waWithdrawal||""};
+    }
+  });
+}
+window.loginUser=async()=>{
+  const u=document.getElementById("loginUser").value.trim().toLowerCase();
+  const p=document.getElementById("loginPass").value;
+  if(!u||!p){showToast("Username/Mobile aur Password enter karo");return;}
+  showLoader(true);
+  try{
+    let user=await fetchClientByUsername(u);
+    if(!user){ user=await fetchClientByMobile(u); }
+    if(!user || user.password!==p){showToast("Invalid login"); showLoader(false); return;}
+    if(user.isSuspended){showToast("⛔ Suspended: "+(user.suspendReason||"Contact Admin")); showLoader(false); return;}
+    await showMainPage(user);
+  }catch(e){showToast(e.message);}
+  showLoader(false);
+}
+window.demoLogin=async()=>{
+  showLoader(true);
+  try{
+    let demo=await fetchClientByUsername("demo");
+    if(!demo){
+      const now=new Date();
+      await setDoc(doc(db,"clients","demo"),{
+        mobile:"9999999999", username:"demo", displayName:"Demo User", name:"Demo User",
+        password:"Asdf@12", coins:1000, exposure:0, bonus:1000, bonusAdded:false,
+        isSuspended:false, history:[], createdAt:now.toISOString()
+      });
+      demo=await fetchClientByUsername("demo");
+    }
+    await showMainPage(demo);
+  }catch(e){showToast(e.message);}
+  showLoader(false);
+}
+window.logout=()=>{localStorage.removeItem("play55_current_user"); currentUser=null; document.getElementById("userMenu").style.display="none"; document.getElementById("userMenuOverlay").style.display="none"; showLogin();}
+window.openSupport=async(where)=>{
+  await loadSettingsFirebase();
+  const s=getSettings();
+  window.open("https://wa.me/"+(where==='demo'?s.waDemo:s.waMain)+"?text="+encodeURIComponent("hello i need id"),"_blank");
+}
+window.openDeposit=()=>{ document.getElementById('depositModal').style.display='flex'; loadQRforUser(); }
+window.openWithdraw=()=>{ document.getElementById('withdrawModal').style.display='flex'; }
+window.forgotPassword=()=>showToast("WhatsApp support se contact karo");
+window.shareSite=()=>{navigator.clipboard.writeText(location.href); showToast("Link copied");}
+let demoOTP=""; window.sendDemoOTP=()=>{const m=document.getElementById("regMobile").value.trim();if(!m){showToast("Mobile enter karo");return;}demoOTP=Math.floor(100000+Math.random()*900000).toString();document.getElementById("otpMessage").textContent="Demo OTP: "+demoOTP;}
+window.registerUser=async()=>{
+  const name=document.getElementById("regName").value.trim();
+  const mobile=document.getElementById("regMobile").value.trim();
+  const username=document.getElementById("regUsername").value.trim().toLowerCase();
+  const password=document.getElementById("regPassword").value||"Asdf@12";
+  const otp=document.getElementById("regOtp").value.trim();
+  if(!name||!mobile||!username){showToast("Name, mobile, username required");return;}
+  if(!demoOTP||otp!==demoOTP){showToast("OTP verify karo");return;}
+  showLoader(true);
+  try{
+    const exists=await fetchClientByUsername(username);
+    if(exists){showToast("Username exists"); showLoader(false); return;}
+    const now=new Date();
+    await setDoc(doc(db,"clients",username),{
+      mobile, username, displayName:name, name, password, source:'self',
+      coins:0, exposure:0, bonus:1000, bonusAdded:false, isSuspended:false,
+      history:[{date:now.toLocaleString(), time:now.toLocaleString(), day:now.toLocaleDateString("en-IN"), iso:now.toISOString(), amount:0, type:"INFO", ref:"REG-"+Date.now().toString().slice(-5), balance:0, desc:"Account Created"}],
+      createdAt:now.toISOString()
+    });
+    showToast("Account created! Admin se coin add karwao");
+    showLogin();
+  }catch(e){showToast(e.message);}
+  showLoader(false);
+}
+window.loadQRforUser=async()=>{
+  try{
+    const snap=await getDoc(SETTINGS_REF);
+    if(snap.exists()){
+     const d=snap.data();
+     const qr = d.qr2 || d.qrUrl || "";
+     document.getElementById('userQRBox').innerHTML = qr? `<img src="${qr}" style="width:200px;border-radius:12px;border:2px solid gold"><p style="font-size:11px;margin-top:6px;color:#000">${d.upiId||bank.upi||''}<br>${d.bank||''}</p>` : 'QR not set by Admin';
+document.getElementById('userBankBox').innerHTML = `<b>Bank:</b> ${d.bankName||'N/A'}<br><b>Holder:</b> ${d.holderName||'N/A'}<br><b>A/C No:</b> ${d.accNumber||'N/A'}<br><b>IFSC:</b> ${d.ifscCode||'N/A'}<br><b>UPI:</b> ${d.upiId||'N/A'}`;
+    }
+  }catch(e){}
+}
+
+window.showToast = (m)=> alert(m);
+window.depositMethod = 'qr';
+window.switchDepositTab = (type)=>{
+  depositMethod = type;
+  document.getElementById('qrView').style.display = type==='qr'? 'block' : 'none';
+  document.getElementById('bankView').style.display = type==='bank'? 'block' : 'none';
+  document.getElementById('tabQr').style.background = type==='qr'? 'var(--gold)' : '#1a2f3a';
+  document.getElementById('tabQr').style.color = type==='qr'? '#000' : '#fff';
+  document.getElementById('tabBank').style.background = type==='bank'? 'var(--gold)' : '#1a2f3a';
+  document.getElementById('tabBank').style.color = type==='bank'? '#000' : '#fff';
+}
+
+window.submitDeposit=async()=>{
+  const amt = document.getElementById('depAmount').value.trim();
+  const utr = document.getElementById('depUTR').value.trim();
+  const slipFile = document.getElementById('depSlip').files[0];
+  if(!amt ||!utr ||!slipFile) return showToast('Amount, Slip aur UTR teeno dalo *');
+  if(parseInt(amt) < 100) return showToast('Min Deposit 100 hai');
+  let btn = document.getElementById('depBtn');
+  btn.disabled=true; btn.innerText="Uploading...";
+  try{
+   // Fix: compress karne ke liye
+const toCompress = (f)=> new Promise(r=>{ const i=new Image(); i.onload=()=>{ const c=document.createElement('canvas'); c.width=500; c.height=i.height*(500/i.width); c.getContext('2d').drawImage(i,0,0,c.width,c.height); r(c.toDataURL('image/jpeg',0.35)); }; const rd=new FileReader(); rd.onload=()=>i.src=rd.result; rd.readAsDataURL(f); });
+const slipBase64 = await toCompress(slipFile);
+    await addDoc(collection(db,'deposits'),{ username: currentUser.username, amount: parseInt(amt), utr: utr, method: depositMethod, slipUrl: slipBase64, status: 'pending', time: new Date().toLocaleString(), createdAt: serverTimestamp() });
+    showToast('✅ Deposit Request Sent! Pending me hai');
+    document.getElementById('depositModal').style.display='none';
+    document.getElementById('depAmount').value=''; document.getElementById('depUTR').value=''; document.getElementById('depSlip').value='';
+  }catch(e){ showToast("Error: "+e.message); }
+  btn.disabled=false; btn.innerText="Confirm Deposit";
+}
+window.submitWithdraw = async()=>{
+  const amount = document.getElementById('wAmount').value.trim();
+  const bankName = document.getElementById('wBankName').value.trim();
+  const holderName = document.getElementById('wHolderName').value.trim();
+  const ifsc = document.getElementById('wIfsc').value.trim();
+  const accNo = document.getElementById('wAccNo').value.trim();
+
+  if(!amount || !bankName || !holderName || !ifsc || !accNo){
+    return showToast('Saare 5 box bharo!');
+  }
+  if(parseInt(amount) < 500) return showToast('Min 500');
+  if(!currentUser || (currentUser.coins||0) < parseInt(amount)) return showToast('Balance kam hai');
+
+  let btn = document.getElementById('wBtn');
+  btn.disabled = true; btn.innerText = "Processing...";
+
+  try{
+    await addDoc(collection(db,'withdrawals'),{
+      username: currentUser.username,
+      amount: parseInt(amount),
+      bankName: bankName,
+      holderName: holderName,
+      ifsc: ifsc,
+      accNo: accNo,
+      status: 'pending',
+      time: new Date().toLocaleString(),
+      createdAt: new Date().toISOString()
+    });
+    showToast('✅ Withdrawal Request Send Ho Gayi! Pending Me Hai');
+    document.getElementById('withdrawModal').style.display='none';
+    ["wAmount","wBankName","wHolderName","wIfsc","wAccNo"].forEach(id=>document.getElementById(id).value="");
+  }catch(e){ showToast("Error: "+e.message); }
+  
+  btn.disabled = false; btn.innerText = "Process To Withdrawal";
+}
+
+window.changePassword=async()=>{
+  let oldP=document.getElementById("oldPass").value; let newP=document.getElementById("newPass").value;
+  if(!oldP||!newP){showToast("Dono password dalo");return;}
+  if(currentUser.password!==oldP){showToast("Old password galat");return;}
+  const now=new Date();
+  await updateDoc(doc(db,"clients",currentUser.username),{
+    password:newP,
+    history: arrayUnion({date:now.toLocaleString(), day:now.toLocaleDateString(), iso:now.toISOString(), amount:0, type:"INFO", ref:"PASS-"+Date.now().toString().slice(-5), balance:currentUser.coins, desc:`Password Changed`, time:now.toLocaleString()})
+  });
+  currentUser.password=newP;
+  showToast("Password change ho gaya");
+  document.getElementById("oldPass").value=""; document.getElementById("newPass").value="";
+}
+
+(async()=>{
+  await loadSettingsFirebase();
+  await loadMatchesFirebase();
+  renderMatches();
+  const cur=localStorage.getItem("play55_current_user");
+  if(!cur){showLogin(); return;}
+  showLoader(true);
+  try{
+    const user=await fetchClientByUsername(cur);
+    if(user){
+      if(user.isSuspended){showToast("⛔ Suspended"); localStorage.removeItem("play55_current_user"); showLogin();}
+      else await showMainPage(user);
+    }else showLogin();
+  }catch{showLogin();}
+  showLoader(false);
+})();
+</script>
+
+<!-- DEPOSIT MODAL -->
+<div id="depositModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99;align-items:center;justify-content:center;padding:15px">
+ <div style="background:#0f1f28;width:100%;max-width:420px;border-radius:16px;padding:20px;border:1px solid var(--gold);max-height:90vh;overflow-y:auto">
+  <h3 style="color:var(--gold);margin:0 0 10px">💰 Deposit <span style="float:right;cursor:pointer" onclick="document.getElementById('depositModal').style.display='none'">✖</span></h3>
+
+  <!-- 1. 2 Option Tabs -->
+  <div style="display:flex;gap:8px;margin:12px 0">
+    <button id="tabQr" onclick="switchDepositTab('qr')" style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--gold);background:var(--gold);color:#000;font-weight:bold">📷 QR Code</button>
+    <button id="tabBank" onclick="switchDepositTab('bank')" style="flex:1;padding:10px;border-radius:8px;border:1px solid #444;background:#1a2f3a;color:#fff">🏦 Account Details</button>
+  </div>
+
+  <!-- QR View -->
+  <div id="qrView" style="text-align:center;margin:10px 0;padding:10px;background:#fff;border-radius:12px">
+    <div id="userQRBox">Loading QR...</div>
+  </div>
+
+  <!-- Bank Details View -->
+  <div id="bankView" style="display:none;margin:10px 0;padding:12px;background:#1a2f3a;border-radius:12px;border:1px dashed var(--gold);line-height:1.8">
+    <div id="userBankBox" style="color:#fff;font-size:13px">Loading Bank Details...</div>
+  </div>
+
+  <!-- 2. Common Inputs - Compulsory -->
+  <div style="margin-top:12px">
+    <input id="depAmount" type="number" class="field" placeholder="1. Amount (e.g. 500) *">
+    <label style="color:#aaa;font-size:11px;margin:8px 0 4px;display:block">2. Payment Slip / Screenshot *</label>
+    <input id="depSlip" type="file" accept="image/*" class="field" style="padding:8px;background:#1a2f3a">
+    <input id="depUTR" class="field" placeholder="3. UTR / Transaction ID (12 digit) *" style="margin-top:8px">
+  </div>
+
+  <!-- 3. Confirm Button -->
+  <button id="depBtn" class="loginBtn" onclick="submitDeposit()" style="margin-top:12px">Confirm Deposit</button>
+  <p style="font-size:10px;color:#888;text-align:center;margin-top:6px">Teeno field compulsory hai</p>
+ </div>
+</div>
+
+<!-- NEW WITHDRAWAL MODAL - 5 BOX -->
+<div id="withdrawModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99;align-items:center;justify-content:center;padding:15px">
+ <div style="background:#0f1f28;width:100%;max-width:400px;border-radius:16px;padding:20px;border:1px solid #ef4444">
+  <h3 style="color:#ff6a6a">🏧 Withdrawal <span style="float:right;cursor:pointer" onclick="document.getElementById('withdrawModal').style.display='none'">✖</span></h3>
+  <p style="color:#ff4444; font-size:11px; text-align:center; margin:8px 0; font-weight:bold; background:#2a0f0f; padding:6px; border-radius:6px;">
+    Note: If any issue, withdrawal may take 24 to 48 hours to be credited.
+  </p>
+  <input id="wAmount" type="number" class="field" placeholder="1. Amount (Min 500)">
+  <input id="wBankName" class="field" placeholder="2. Bank Name (SBI, HDFC)">
+  <input id="wHolderName" class="field" placeholder="3. Account Holder Name">
+  <input id="wIfsc" class="field" placeholder="4. IFSC Code">
+  <input id="wAccNo" type="number" class="field" placeholder="5. Account Number">
+  <button id="wBtn" class="loginBtn" style="background:#ef4444;color:#fff; width:100%" onclick="submitWithdraw()">Process To Withdrawal</button>
+ </div>
+</div>
+
+</script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Play55 - Royal Wheel</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#1a1030;display:flex;justify-content:center}
+.main{width:100%;max-width:420px;min-height:100vh;position:relative;display:flex;flex-direction:column;overflow:hidden;background:radial-gradient(circle at top,#3a2060 0%,#1a1030 35%,#0a0a0a 100%)}
+.main::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px, rgba(212,175,55,.12) 1px, transparent 0),linear-gradient(30deg, rgba(212,175,55,.05) 0%, transparent 50%);background-size:28px 28px, 80px 80px;pointer-events:none;z-index:0}
+.topBar{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:linear-gradient(180deg,#2a1652,#1a1030);border-bottom:2px solid #d4af37;box-shadow:0 2px 15px rgba(212,175,55,.3)}
+.backBtn{width:36px;height:36px;border-radius:50%;background:radial-gradient(circle,#ffe27a,#a67c00);color:#3a2600;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid #fff}
+.logoBox{text-align:center}.logoBox h1{color:#ffd700;font-size:22px;font-style:italic;font-weight:900;text-shadow:0 0 10px gold}.logoBox p{color:#d4af37;font-size:8px;letter-spacing:3px;font-weight:900}
+.coinTop{background:#0a171e;border:2px solid #d4af37;border-radius:20px;padding:6px 14px;color:#ffe27a;font-weight:900;font-size:13px}
+.frame{flex:1;display:flex;align-items:center;justify-content:center;position:relative;padding:20px 10px;z-index:1}
+.pointerFixed{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:20;border-left:20px solid transparent;border-right:20px solid transparent;border-top:32px solid #ffd700;filter:drop-shadow(0 0 10px gold) drop-shadow(0 2px 4px #000)}
+.wheelOuter{width:92%;max-width:350px;aspect-ratio:1/1;border-radius:50%;border:8px solid #d4af37;box-shadow:0 0 0 6px #1a3340,0 0 0 8px #2a1652,0 0 50px rgba(212,175,55,.5);position:relative;background:#000}
+#rotWheelOnly{width:100%;height:100%;border-radius:50%;position:relative;overflow:hidden;background:conic-gradient(from 0deg,#065f46 0 45deg,#831843 45deg 90deg,#047857 90deg 135deg,#9d174d 135deg 180deg,#065f46 180deg 225deg,#831843 225deg 270deg,#047857 270deg 315deg,#9d174d 315deg 360deg)}
+.label{position:absolute;top:50%;left:50%;width:48%;transform-origin:left center;display:flex;justify-content:flex-end;padding-right:24px;font-weight:900;font-size:18px;z-index:2;color:#fff;text-shadow:0 1px 4px #000,0 0 6px #000}
+.label:nth-child(1){transform:translateY(-50%) rotate(22.5deg)}.label:nth-child(2){transform:translateY(-50%) rotate(67.5deg)}
+.label:nth-child(3){transform:translateY(-50%) rotate(112.5deg)}.label:nth-child(4){transform:translateY(-50%) rotate(157.5deg)}
+.label:nth-child(5){transform:translateY(-50%) rotate(202.5deg)}.label:nth-child(6){transform:translateY(-50%) rotate(247.5deg)}
+.label:nth-child(7){transform:translateY(-50%) rotate(292.5deg)}.label:nth-child(8){transform:translateY(-50%) rotate(337.5deg)}
+.centerFixed{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:30%;height:30%;background:radial-gradient(circle at 30% 30%,#ffe27a,#d4af37 50%,#a67c00);border-radius:50%;border:4px solid #fff;display:flex;align-items:center;justify-content:center;font-size:26px;z-index:5;box-shadow:0 0 0 4px #d4af37,0 0 20px gold}
+#resultOverlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:30;display:none;width:62%;max-width:200px}
+.resultCard{border-radius:16px;padding:12px;text-align:center;border:2px solid #fff;box-shadow:0 8px 25px rgba(0,0,0,.5)}
+.winCard{background:linear-gradient(180deg,#22c55e,#15803d)}.lossCard{background:linear-gradient(180deg,#ef4444,#991b1b)}
+.resultCard h2{font-size:18px;font-weight:900;color:#fff}.resultCard p{font-size:12px;font-weight:800;color:#fff;margin-top:3px}
+.bottom{position:relative;z-index:2;background:linear-gradient(180deg,#1a1030,#000);border-top:2px solid #d4af37;padding:14px;border-radius:20px 20px 0 0}
+.curBet{color:#d4af37;text-align:center;font-size:11px;font-weight:900;letter-spacing:1px;margin-bottom:10px}
+.betRow{display:flex;gap:8px;margin-bottom:12px}.bChip{flex:1;aspect-ratio:1/1;border-radius:50%;background:radial-gradient(circle at 30% 30%,#3a2060,#1a1030);border:2.5px solid #d4af37;color:#ffe27a;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s}.bChip.on{background:radial-gradient(circle,#ffe27a,#d4af37);color:#3a2600;transform:translateY(-5px) scale(1.05);border-color:#fff}
+.spinBtn{width:100%;background:linear-gradient(180deg,#fff8a0,#d4af37 40%,#a67c00);border-radius:12px;padding:14px;font-size:24px;font-weight:900;letter-spacing:4px;color:#2a1a00;border:3px solid #fff8a0;cursor:pointer;box-shadow:0 4px 0 #5a4000}
+.spinBtn:active{transform:translateY(2px)}
+</style>
+</head>
+<body>
+<div class="main">
+<div class="topBar">
+<div class="backBtn" onclick="location.href='../index.html'"><</div>
+<div class="logoBox"><h1>Play55</h1><p>👑 ROYAL WHEEL 👑</p></div>
+<div class="coinTop">🪙 <span id="balTop">0</span></div>
+</div>
+<div class="frame">
+<div class="pointerFixed"></div>
+<div class="wheelOuter">
+<div id="rotWheelOnly">
+<div class="label">15x</div><div class="label">0x</div>
+<div class="label">8x</div><div class="label">0x</div>
+<div class="label">5x</div><div class="label">0x</div>
+<div class="label">2x</div><div class="label">0x</div>
+</div>
+<div class="centerFixed">👑</div>
+</div>
+<div id="resultOverlay"><div class="resultCard" id="resultCard"><h2 id="resTitle"></h2><p id="resSub"></p></div></div>
+</div>
+<div class="bottom">
+<div class="curBet" id="curBetTxt">👑 SELECT BET - SPACE 👑</div>
+<div class="betRow"><div class="bChip" onclick="pick(10,this)">10</div><div class="bChip" onclick="pick(50,this)">50</div><div class="bChip" onclick="pick(100,this)">100</div><div class="bChip" onclick="pick(500,this)">500</div><div class="bChip" onclick="pick(1000,this)">1K</div></div>
+<button class="spinBtn" id="spinBtn" disabled onclick="spin()">★ SPIN ★</button>
+</div>
+</div>
+
+<script type="module">
+import { db } from '../firebase.js';
+import { doc, getDoc, updateDoc, increment, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const username = (localStorage.getItem("play55_current_user")||"demo").toLowerCase();
+let fbCoins=0;
+window.fbUsername=username;
+async function initBal(){
+  const ref=doc(db,"clients",username);
+  const snap=await getDoc(ref);
+  if(snap.exists()){
+    fbCoins=snap.data().coins||0;
+    window.fbBal=fbCoins;
+    document.getElementById("balTop").innerText=Math.floor(fbCoins);
+    localStorage.setItem("play55_balance",Math.floor(fbCoins));
+    onSnapshot(ref,(s)=>{
+      if(s.exists()){
+        fbCoins=s.data().coins||0;
+        window.fbBal=fbCoins;
+        document.getElementById("balTop").innerText=Math.floor(fbCoins);
+        localStorage.setItem("play55_balance",Math.floor(fbCoins));
+      }
+    });
+  }
+}
+window.getBal=()=> window.fbBal||fbCoins||0;
+window.setBal=(v)=>{ document.getElementById("balTop").innerText=Math.floor(v); localStorage.setItem("play55_balance",Math.floor(v)); }
+window.fbDeduct=async(amt,reason)=>{
+  const now=new Date();
+  await updateDoc(doc(db,"clients",username),{
+    coins: increment(-amt),
+    history: arrayUnion({date:now.toLocaleString("en-IN"), day:now.toLocaleDateString("en-IN"), iso:now.toISOString(), amount:amt, type:"CUT", reason:reason, ref:"BET-"+Date.now().toString().slice(-6), balance:fbCoins-amt, game:"WHEEL"})
+  });
+}
+window.fbAdd=async(amt,reason,multX)=>{
+  const now=new Date();
+  await updateDoc(doc(db,"clients",username),{
+    coins: increment(amt),
+    history: arrayUnion({date:now.toLocaleString("en-IN"), day:now.toLocaleDateString("en-IN"), iso:now.toISOString(), amount:amt, type:"ADD", reason:reason, ref:"WIN-"+Date.now().toString().slice(-6), balance:fbCoins+amt, game:"WHEEL", crash:multX})
+  });
+}
+initBal();
+</script>
+
+<script>
+let bet=0,rot=0,spinning=false;
+const mults=[15,0,8,0,5,0,2,0];
+function pick(v,el){bet=v; document.querySelectorAll(".bChip").forEach(c=>c.classList.remove("on")); el.classList.add("on"); curBetTxt.innerText="BET: "+v; spinBtn.disabled=false}
+function showResult(isWin,mul,amt){
+  resultOverlay.style.display="block";
+  if(isWin){resultCard.className="resultCard winCard"; resTitle.innerText="YOU WIN!"; resSub.innerText=mul+"x = +"+amt}
+  else{resultCard.className="resultCard lossCard"; resTitle.innerText="BETTER LUCK"; resSub.innerText="0x"}
+  setTimeout(()=>resultOverlay.style.display="none",1500);
+}
+function getIndex(){
+  let totalBet=parseInt(localStorage.getItem("total_bet")||"0");
+  let totalWin=parseInt(localStorage.getItem("total_win")||"0");
+  let rtp=totalBet>0? totalWin/totalBet : 0;
+  if(totalBet>5000 && rtp>0.89){
+    let z=[1,3,5,7]; return z[Math.floor(Math.random()*z.length)];
+  }
+  if(Math.random()<0.47){
+    let p=Math.random()*100;
+    if(p<65) return 6;
+    if(p<82) return 4;
+    if(p<94) return 2;
+    return 0;
+  }else{
+    let z=[1,3,5,7]; return z[Math.floor(Math.random()*z.length)];
+  }
+}
+async function spin(){
+ if(spinning||!bet) return; if(window.getBal()<bet){alert("Balance low - Admin se Add karwao"); return}
+ spinning=true;
+ try{ await window.fbDeduct(bet,`Royal Wheel Bet ${bet}`); }catch(e){ alert(e.message); spinning=false; return; }
+ window.fbBal-=bet; setBal(window.fbBal);
+
+ let totalBet=parseInt(localStorage.getItem("total_bet")||"0")+bet;
+ localStorage.setItem("total_bet",totalBet);
+ let house=parseInt(localStorage.getItem("house_profit")||"0")+bet;
+ localStorage.setItem("house_profit",house);
+
+ let idx=getIndex();
+ let labelAngle=idx*45+22.5;
+ let desiredMod=(270-labelAngle+360)%360;
+ let wheel=document.getElementById("rotWheelOnly");
+ wheel.style.transition="transform 3s linear";
+ rot+=1440;
+ wheel.style.transform=`rotate(${rot}deg)`;
+
+ setTimeout(()=>{
+   let currentMod=rot%360;
+   let need=(desiredMod-currentMod+360)%360;
+   wheel.style.transition="transform 3s cubic-bezier(0.15, 0.85, 0.15, 1)";
+   rot+=1080+need;
+   wheel.style.transform=`rotate(${rot}deg)`;
+ },3000);
+
+ setTimeout(async()=>{
+  let m=mults[idx];
+  if(m>0){
+    let win=m*bet;
+    let totalWin=parseInt(localStorage.getItem("total_win")||"0")+win;
+    localStorage.setItem("total_win",totalWin);
+    house=parseInt(localStorage.getItem("house_profit")||"0")-win;
+    localStorage.setItem("house_profit",house);
+    try{ await window.fbAdd(win+bet,`Wheel Win ${m}x = ${win}`, m); }catch(e){}
+    window.fbBal+=win+bet; setBal(window.fbBal);
+    showResult(true,m,win);
+  }else{
+    try{
+      const { doc, updateDoc, arrayUnion } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+      const { db } = await import('../firebase.js');
+      const now=new Date();
+      await updateDoc(doc(db,"clients",window.fbUsername),{
+        history: arrayUnion({date:now.toLocaleString("en-IN"), day:now.toLocaleDateString("en-IN"), iso:now.toISOString(), amount:bet, type:"INFO", reason:`Wheel Loss 0x`, ref:"LOSS-"+Date.now().toString().slice(-6), balance: window.fbBal})
+      });
+    }catch(e){}
+    showResult(false,0,0);
+  }
+  spinning=false;
+ },6100);
+}
+document.addEventListener("keydown",e=>{if(e.code==="Space"){e.preventDefault(); spin()}});
+</script>
+</body>
+</html>

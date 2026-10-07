@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Play55 Plinko 1000x</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#070a1a;color:#fff;height:100dvh;overflow:hidden;display:flex;flex-direction:column}
+.top{background:linear-gradient(180deg,#1e2a7a,#0f1742);height:44px;padding:0 12px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;border-bottom:1px solid #c9a227}
+.logo{font-weight:900;font-style:italic;font-size:20px;display:flex;align-items:center;gap:6px}.logo span{color:#ffcf00;text-shadow:0 0 8px #c9a227}
+.logo img{width:28px;height:28px;border-radius:6px;border:1px solid #c9a227;object-fit:cover}
+.bal{background:#111741;padding:5px 12px;border-radius:20px;font-weight:800;font-size:12px;border:1px solid #c9a227}
+.gameWrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0;overflow:hidden;background:#0a0e2a;gap:0}
+#c{width:100%;max-width:380px;height:58vh;max-height:380px;display:block;filter:drop-shadow(0 10px 15px #000);background: url('../images/plinko.webp') center/cover no-repeat, #0a0e2a}
+.controls{background:linear-gradient(#151a3a,#0a0e26);border-top:2px solid #c9a227;border-radius:14px 14px 0 0;padding:6px 8px;width:100%;max-width:420px;flex-shrink:0;margin-top:0}
+.row{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+.row button{flex:1;min-width:44px;background:#0e1230;border:1.5px solid #2a366a;color:#fff;padding:6px 2px;border-radius:7px;font-weight:800;font-size:11px}
+.row button.active{background:#ffd000;color:#000;border-color:#ffd000;box-shadow:0 0 10px #c9a227}
+.row button:disabled{opacity:0.4}
+.betBtn{width:100%;margin-top:5px;height:42px;background:linear-gradient(#40ff7c,#0fa63a);border:0;border-radius:10px;color:#fff;font-weight:900;font-size:16px;box-shadow:0 3px #075a20}
+.betBtn:disabled{background:#333;box-shadow:none;color:#777}
+.win{text-align:center;font-size:14px;font-weight:900;min-height:18px;margin-top:3px}
+.backBtn{text-align:center;margin-top:4px;color:#c9a227;font-size:12px;font-weight:700;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="top">
+<div class="logo" onclick="location.href='../index.html'">
+<img src="../images/plinko.webp" onerror="this.style.display='none'" alt="dp">
+<span>Play55</span> PLINKO</div>
+<div class="bal">🪙 <span id="balVal">0</span></div>
+</div>
+
+<div class="gameWrap">
+<canvas id="c" width="380" height="390"></canvas>
+<div class="controls">
+<div class="row"><button class="bBtn" onclick="setBet(10)">10</button><button class="bBtn" onclick="setBet(50)">50</button><button class="bBtn" onclick="setBet(100)">100</button><button class="bBtn" onclick="setBet(500)">500</button><button class="bBtn" onclick="setBet(1000)">1000</button></div>
+<div class="row"><button class="rBtn" id="rLow" onclick="setRisk('low')">Low</button><button class="rBtn" id="rMed" onclick="setRisk('med')">Medium</button><button class="rBtn" id="rHigh" class="active" onclick="setRisk('high')">High 1000x</button></div>
+<div style="margin-top:4px;display:flex;justify-content:space-between;font-size:11px"><span>BET: <b id="betTxt">10 INN</b></span><span id="last">Last: -</span></div>
+<button class="betBtn" id="dropBtn" onclick="drop()">DROP BALL</button>
+<div class="win" id="win"></div>
+<div class="backBtn" onclick="location.href='../index.html'">← Back to Home</div>
+</div>
+</div>
+
+<script type="module">
+import { db } from '../firebase.js';
+import { doc, getDoc, updateDoc, increment, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const username = (localStorage.getItem("play55_current_user")||"demo").toLowerCase();
+let fbCoins=0;
+window.fbUsername=username;
+window.fbBal=0;
+async function initBal(){
+  const ref=doc(db,"clients",username);
+  const snap=await getDoc(ref);
+  if(!snap.exists()){ document.getElementById("balVal").innerText=0; return; }
+  fbCoins=snap.data().coins||0;
+  window.fbBal=fbCoins;
+  document.getElementById("balVal").innerText=Math.floor(fbCoins);
+  localStorage.setItem("play55_balance",Math.floor(fbCoins));
+  onSnapshot(ref,(s)=>{
+    if(s.exists()){
+      fbCoins=s.data().coins||0;
+      window.fbBal=fbCoins;
+      document.getElementById("balVal").innerText=Math.floor(fbCoins);
+      localStorage.setItem("play55_balance",Math.floor(fbCoins));
+    }
+  });
+}
+window.updateBalance=async(delta)=>{
+  // delta negative = CUT, positive = ADD
+  const now=new Date();
+  const ref=doc(db,"clients",username);
+  if(delta<0){
+    let amt=Math.abs(delta);
+    if(fbCoins<amt) return false;
+    await updateDoc(ref,{
+      coins: increment(-amt),
+      history: arrayUnion({date:now.toLocaleString("en-IN"), day:now.toLocaleDateString("en-IN"), iso:now.toISOString(), amount:amt, type:"CUT", reason:`Plinko Bet ${amt}`, ref:"BET-"+Date.now().toString().slice(-6), balance:fbCoins-amt, game:"PLINKO"})
+    });
+    fbCoins-=amt; window.fbBal=fbCoins;
+  } else {
+    await updateDoc(ref,{
+      coins: increment(delta),
+      history: arrayUnion({date:now.toLocaleString("en-IN"), day:now.toLocaleDateString("en-IN"), iso:now.toISOString(), amount:delta, type:"ADD", reason:`Plinko Win`, ref:"WIN-"+Date.now().toString().slice(-6), balance:fbCoins+delta, game:"PLINKO"})
+    });
+    fbCoins+=delta; window.fbBal=fbCoins;
+  }
+  document.getElementById("balVal").innerText=Math.floor(fbCoins);
+  localStorage.setItem("play55_balance",Math.floor(fbCoins));
+  return true;
+}
+window.getBal=()=> window.fbBal||fbCoins||0;
+initBal();
+</script>
+
+<script>
+let audioCtx; function beep(f,v,t){try{if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); let o=audioCtx.createOscillator(); let g=audioCtx.createGain(); o.frequency.value=f; g.gain.value=v; o.connect(g); g.connect(audioCtx.destination); o.start(); g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+t); o.stop(audioCtx.currentTime+t);}catch(e){}}
+
+const canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
+let bet=10, risk='high', rows=12, busy=false;
+let mults={low:[3,1.2,0.8,0.5,0.3,0.5,0.8,1.2,3], med:[20,5,1.2,0.5,0.2,0.5,1.2,5,20], high:[100,80,15,3,0.2,0.2,0.2,3,15,80,100]};
+let pinsPos=[];
+
+let dpImg = new Image();
+dpImg.src = '../images/plinko.webp';
+let dpLoaded = false;
+dpImg.onload = ()=>{ dpLoaded=true; drawBoard(); };
+dpImg.onerror = ()=>{ dpLoaded=false; };
+
+function setBet(v){if(busy) return; bet=v; document.getElementById("betTxt").innerText=v+" INN";}
+function setRisk(r){if(busy) return; risk=r; document.querySelectorAll(".rBtn").forEach(b=>b.classList.remove('active')); document.getElementById(r=='low'?'rLow':r=='med'?'rMed':'rHigh').classList.add('active'); drawBoard();}
+
+function buildPins(){
+  pinsPos=[];
+  for(let y=0;y<rows;y++){let pegs=y+3; for(let x=0;x<pegs;x++){let px=190+(x-(pegs-1)/2)*24; let py=28+y*24; pinsPos.push({x:px,y:py});}}
+}
+
+function drawBoard(bx,by){
+  ctx.clearRect(0,0,380,390);
+  if(dpLoaded){
+    ctx.globalAlpha=0.35;
+    ctx.drawImage(dpImg,0,0,380,390);
+    ctx.globalAlpha=1;
+    ctx.fillStyle="rgba(10,14,42,0.75)";
+    ctx.fillRect(0,0,380,390);
+  } else {
+    let bg=ctx.createLinearGradient(0,0,0,390);
+    bg.addColorStop(0,"#162055");
+    bg.addColorStop(0.5,"#0e1333");
+    bg.addColorStop(1,"#070a1a");
+    ctx.fillStyle=bg; ctx.fillRect(0,0,380,390);
+  }
+  ctx.strokeStyle="rgba(201,162,39,0.15)"; ctx.lineWidth=1; ctx.strokeRect(0.5,0.5,379,389);
+  let glow=ctx.createRadialGradient(190,0,10,190,0,400);
+  glow.addColorStop(0,"rgba(201,162,39,0.18)"); glow.addColorStop(0.4,"rgba(0,0,0,0)"); glow.addColorStop(1,"rgba(0,0,0,0)");
+  ctx.fillStyle=glow; ctx.fillRect(0,0,380,390);
+  pinsPos.forEach(p=>{
+    ctx.fillStyle="rgba(0,0,0,.6)"; ctx.beginPath(); ctx.ellipse(p.x+1,p.y+4,5,2.2,0,0,7); ctx.fill();
+    let g=ctx.createRadialGradient(p.x-1.2,p.y-1.8,0,p.x,p.y,5);
+    g.addColorStop(0,"#fff"); g.addColorStop(0.3,"#aab8ff"); g.addColorStop(0.6,"#3a4a9a"); g.addColorStop(1,"#121738");
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(p.x,p.y,4.2,0,Math.PI*2); ctx.fill();
+  });
+  let m=mults[risk]; let w=380/m.length;
+  m.forEach((val,i)=>{
+    let gx=i*w;
+    ctx.fillStyle = val>=100?"#ff1a1a":val>=80?"#ff9d00":val>=15?"#ffcc00":val>=3?"#2ad166":val>=0.5?"#5a7dff":"#3a3a5a";
+    ctx.fillRect(gx+1,352,w-2,30);
+    ctx.fillStyle="rgba(255,255,255,.35)"; ctx.fillRect(gx+1,352,w-2,5);
+    ctx.fillStyle= val>=15?"#000":"#fff"; ctx.font='bold 10px Arial'; ctx.textAlign="center"; ctx.fillText(val+'x',gx+w/2,371); ctx.textAlign="left";
+  });
+  if(bx!==undefined){
+    ctx.fillStyle="rgba(0,0,0,.8)"; ctx.beginPath(); ctx.ellipse(bx+2,by+8,7,2.5,0,0,7); ctx.fill();
+    let gb=ctx.createRadialGradient(bx-2.5,by-3,0,bx,by,7.5);
+    gb.addColorStop(0,"#ff7a7a"); gb.addColorStop(0.25,"#cc0000"); gb.addColorStop(0.55,"#7a0000"); gb.addColorStop(0.85,"#3a0000"); gb.addColorStop(1,"#1a0000");
+    ctx.fillStyle=gb; ctx.shadowColor="#ff1a1a"; ctx.shadowBlur=12; ctx.beginPath(); ctx.arc(bx,by,7,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+    ctx.fillStyle="rgba(255,255,255,0.7)"; ctx.beginPath(); ctx.arc(bx-2,by-2.5,1.4,0,7); ctx.fill();
+  }
+}
+buildPins(); drawBoard();
+
+function getWinningIndex(){
+  let m=mults[risk]; let r=Math.random()*100;
+  if(risk==='high'){
+    if(r<1) return Math.random()<0.5?0:m.length-1;
+    if(r<5) return Math.random()<0.5?1:m.length-2;
+    if(r<15) return Math.random()<0.5?2:m.length-3;
+    if(r<30) return Math.random()<0.5?3:m.length-4;
+    return Math.floor(m.length/2)+(Math.random()<0.5?-1:0);
+  } else {
+    if(r<50) return Math.floor(m.length/2); else return r<75?1:m.length-2;
+  }
+}
+
+async function drop(){
+  if(busy) return;
+  if(window.getBal()<bet){alert("Balance kam hai - Admin se Add karwao"); return;}
+  let ok = await window.updateBalance(-bet);
+  if(!ok){alert("Balance kam hai!"); return;}
+  busy=true;
+  document.getElementById("dropBtn").disabled=true;
+  document.getElementById("dropBtn").textContent="DROPPING...";
+  document.querySelectorAll(".bBtn,.rBtn").forEach(b=>b.disabled=true);
+  document.getElementById("win").innerText="";
+
+  let targetIdx=getWinningIndex();
+  let m=mults[risk]; let targetX=(targetIdx+0.5)*(380/m.length);
+  let x=190+(Math.random()-0.5)*20, y=10, vx=(Math.random()-0.5)*1.5, vy=0;
+
+  let intv=setInterval(async()=>{
+    vy+=0.28; y+=vy; x+=vx; vx*=0.998;
+    pinsPos.forEach(p=>{
+      let dx=x-p.x, dy=y-p.y, d=Math.hypot(dx,dy);
+      if(d<12 && d>0.1){
+        let nx=dx/d, ny=dy/d;
+        let dot=vx*nx+vy*ny;
+        if(dot<0){
+          vx-=2*dot*nx*0.55;
+          vy-=2*dot*ny*0.55;
+          x=p.x+nx*12; y=p.y+ny*12;
+          if(Math.random()<0.3) beep(600,0.05,0.08);
+        }
+      }
+    });
+    vx+=(targetX-x)*0.0015;
+    if(x<12){x=12; vx=Math.abs(vx)*0.6}
+    if(x>368){x=368; vx=-Math.abs(vx)*0.6}
+    if(y>=345){
+      clearInterval(intv);
+      let mult=m[targetIdx]; let winAmt=bet*mult;
+      await window.updateBalance(winAmt);
+      // update history with mult
+      try{
+        const { doc, updateDoc, arrayUnion } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+        const { db } = await import('../firebase.js');
+        const now=new Date();
+        await updateDoc(doc(db,"clients",window.fbUsername),{
+          history: arrayUnion({date:now.toLocaleString("en-IN"), day:now.toLocaleDateString("en-IN"), iso:now.toISOString(), amount:winAmt, type: mult>=1?"ADD":"INFO", reason:`Plinko ${mult}x - Bet ${bet}`, ref: (mult>=1?"WIN-":"LOSS-")+Date.now().toString().slice(-6), balance: window.getBal(), game:"PLINKO", crash:mult})
+        });
+      }catch(e){}
+
+      if(mult>=1){beep(900,0.3,0.4); document.getElementById("win").style.color="#2ad166";} else {beep(200,0.2,0.4); document.getElementById("win").style.color="#ff4d4d";}
+      document.getElementById("win").innerText= mult>=1? `WIN ${winAmt.toFixed(0)} (${mult}x)` : `LOSS ${mult}x`;
+      document.getElementById("last").innerText="Last: "+mult+"x";
+      drawBoard(targetX,345);
+      busy=false;
+      document.getElementById("dropBtn").disabled=false;
+      document.getElementById("dropBtn").textContent="DROP BALL";
+      document.querySelectorAll(".bBtn,.rBtn").forEach(b=>b.disabled=false);
+    } else {
+      drawBoard(x,y);
+    }
+  },19);
+}
+</script>
+</body>
+</html>
