@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Play55 - Chicken Road 3D</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#070f13;color:#fff;overflow-x:hidden}
+.top{background:#000d14;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #122a33;position:sticky;top:0;z-index:10}
+.logo{font-weight:900;font-style:italic;color:#ffcc00;border:1px solid #ffcc00;padding:2px 10px;border-radius:4px;background:linear-gradient(#1a0e00,#000)}
+.bal{background:#0e2a12;border:1px solid #1a5a25;border-radius:20px;padding:6px 12px;font-weight:800;font-size:13px}
+.bal span{color:#00ff88}
+.gameWrap{max-width:500px;margin:0 auto;padding:12px}
+.road{display:flex;flex-direction:column-reverse;gap:8px;margin:15px 0;position:relative}
+.lane{height:62px;background:linear-gradient(90deg,#13252e,#0a171e);border:1px solid #1c3440;border-radius:12px;display:flex;align-items:center;justify-content:space-around;position:relative;overflow:hidden}
+.lane.active{border-color:#ffcc00;box-shadow:0 0 15px rgba(255,204,0,.4)}
+.lane.done{opacity:.6}
+.chicken{position:absolute;left:10px;font-size:32px;transition:all.3s;z-index:5}
+.multi{position:absolute;right:10px;background:#ffcc00;color:#000;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:900}
+.controls{background:#0f1f28;border:1px solid #1a3340;border-radius:16px;padding:15px;margin-top:10px}
+.betRow{display:flex;gap:8px;margin-bottom:12px}
+.betRow input{flex:1;background:#0a171e;border:1px solid #1e3a4a;color:#fff;border-radius:10px;padding:12px;font-size:16px;outline:none}
+.betBtn{padding:12px 18px;border-radius:10px;border:0;font-weight:900;cursor:pointer}
+.btnGo{background:#ffcc00;color:#000;width:100%;padding:14px;border-radius:12px;border:0;font-size:16px;font-weight:900;cursor:pointer;margin-top:8px;box-shadow:0 4px 15px rgba(255,204,0,.3)}
+.btnCash{background:#00c853;color:#fff;width:100%;padding:14px;border-radius:12px;border:0;font-size:16px;font-weight:900;cursor:pointer;margin-top:8px;display:none}
+.lvlBtns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.lvlBtns button{padding:8px;border-radius:20px;border:1px solid #1c3440;background:#13252e;color:#7a95a3;font-size:12px;font-weight:800;cursor:pointer}
+.lvlBtns button.active{background:#fff;color:#000}
+.info{text-align:center;font-size:13px;color:#7a95a3;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="top">
+<div class="logo">Play55</div>
+<div class="bal">🪙 <span id="bal">0</span></div>
+</div>
+
+<div class="gameWrap">
+<h3 style="text-align:center;color:#ffcc00">🐔 CHICKEN ROAD 3D • 5000x</h3>
+<div class="info">Chicken ko aage bhejo, har lane pe paisa badhega. Trap se bacho!</div>
+<div class="road" id="road"></div>
+<div class="controls">
+<div class="lvlBtns">
+<button class="active" onclick="setDiff('easy',this)">EASY</button>
+<button onclick="setDiff('medium',this)">MEDIUM</button>
+<button onclick="setDiff('hard',this)">HARD</button>
+<button onclick="setDiff('hardcore',this)">HARDCORE</button>
+</div>
+<div class="betRow">
+<input id="betAmt" type="number" value="100" min="10">
+<button class="betBtn" style="background:#13252e;color:#fff;border:1px solid #1c3440" onclick="changeBet(-10)">-10</button>
+<button class="betBtn" style="background:#ffcc00;color:#000" onclick="changeBet(10)">+10</button>
+</div>
+<button id="startBtn" class="btnGo" onclick="startGame()">START - GO 🐔</button>
+<button id="goBtn" class="btnGo" style="display:none" onclick="goNext()">GO NEXT ➜</button>
+<button id="cashBtn" class="btnCash" onclick="cashout()">CASHOUT 💰 <span id="cashAmt">0</span></button>
+<div style="display:flex;gap:8px;margin-top:10px">
+<button onclick="location.href='../index.html'" style="flex:1;padding:10px;border-radius:10px;background:transparent;border:1px solid #ffcc00;color:#ffcc00;font-weight:900">BACK</button>
+</div>
+</div>
+</div>
+
+<script type="module">
+import { db } from '../firebase.js';
+import { doc, getDoc, updateDoc, increment, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const username = (localStorage.getItem("play55_current_user")||"demo").toLowerCase();
+let fbCoins=0;
+window.fbUsername=username;
+async function initBal(){
+  const ref=doc(db,"clients",username);
+  const snap=await getDoc(ref);
+  if(!snap.exists()){ document.getElementById("bal").innerText=0; return; }
+  fbCoins=snap.data().coins||0;
+  window.balance=fbCoins;
+  document.getElementById("bal").innerText=Math.floor(fbCoins);
+  localStorage.setItem("play55_balance",Math.floor(fbCoins));
+  onSnapshot(ref,(s)=>{
+    if(s.exists()){
+      fbCoins=s.data().coins||0;
+      window.balance=fbCoins;
+      document.getElementById("bal").innerText=Math.floor(fbCoins);
+      localStorage.setItem("play55_balance",Math.floor(fbCoins));
+    }
+  });
+}
+window.updateBal=()=>{ document.getElementById("bal").innerText=Math.floor(window.balance); localStorage.setItem("play55_balance",Math.floor(window.balance)); }
+window.fbDeduct=async(amt,reason)=>{
+  const now=new Date();
+  await updateDoc(doc(db,"clients",username),{
+    coins: increment(-amt),
+    history: arrayUnion({date:now.toLocaleString("en-IN"), day:now.toLocaleDateString("en-IN"), iso:now.toISOString(), time:now.toLocaleString(), amount:amt, type:"CUT", reason:reason, ref:"BET-"+Date.now().toString().slice(-6), balance:fbCoins-amt, game:"CHICKEN-ROAD"})
+  });
+}
+window.fbAdd=async(amt,reason,multX)=>{
+  const now=new Date();
+  await updateDoc(doc(db,"clients",username),{
+    coins: increment(amt),
+    history: arrayUnion({date:now.toLocaleString("en-IN"), day:now.toLocaleDateString("en-IN"), iso:now.toISOString(), time:now.toLocaleString(), amount:amt, type:"ADD", reason:reason, ref:"WIN-"+Date.now().toString().slice(-6), balance:fbCoins+amt, game:"CHICKEN-ROAD", crash:multX})
+  });
+}
+window.addHistory=async()=>{} // Firebase handles
+initBal();
+</script>
+
+<script>
+let balance = 1000;
+let bet = 100;
+let currentLane = -1;
+let isPlaying = false;
+let multipliers = [];
+let traps = [];
+let difficulty = 'easy';
+let wonAmount = 0;
+
+const diffSettings = {
+  easy: { lanes:5, trapChance:0.2, mult:[1.1,1.3,1.6,2.0,2.8] },
+  medium: { lanes:5, trapChance:0.35, mult:[1.25,1.7,2.4,3.5,5.0] },
+  hard: { lanes:6, trapChance:0.5, mult:[1.5,2.2,3.8,6.5,10,20] },
+  hardcore: { lanes:8, trapChance:0.6, mult:[2,3.5,7,15,30,80,200,5000] }
+};
+
+function setDiff(d,el){
+  difficulty=d;
+  document.querySelectorAll(".lvlBtns button").forEach(b=>b.classList.remove("active"));
+  el.classList.add("active");
+  if(!isPlaying) buildRoad();
+}
+function changeBet(c){
+  bet = Math.max(10, bet+c);
+  document.getElementById("betAmt").value = bet;
+}
+document.getElementById("betAmt").addEventListener("input", e=>{ bet = Math.max(10, parseInt(e.target.value)||10); });
+
+function buildRoad(){
+  const road = document.getElementById("road");
+  road.innerHTML="";
+  const cfg = diffSettings[difficulty];
+  multipliers = cfg.mult.slice(0,cfg.lanes);
+  traps = [];
+  for(let i=0;i<cfg.lanes;i++){ traps.push(Math.random() < cfg.trapChance); }
+  if(difficulty==='easy' || difficulty==='medium') traps[traps.length-1]=false;
+  for(let i=0;i<cfg.lanes;i++){
+    let lane = document.createElement("div");
+    lane.className="lane";
+    lane.id="lane-"+i;
+    lane.innerHTML=`<span class="multi">${multipliers[i]}x</span>`;
+    road.appendChild(lane);
+  }
+  let ch = document.createElement("div");
+  ch.className="chicken"; ch.id="chicken"; ch.innerText="🐔"; ch.style.bottom="-10px"; ch.style.position="absolute";
+  road.appendChild(ch);
+  updateChickenPos(-1);
+}
+function updateChickenPos(laneIdx){
+  const ch = document.getElementById("chicken");
+  if(!ch) return;
+  if(laneIdx===-1){ ch.style.top="auto"; ch.style.bottom="-5px"; ch.style.left="15px"; }
+  else {
+    const lane = document.getElementById("lane-"+laneIdx);
+    ch.style.top = (lane.offsetTop + 12) + "px";
+    ch.style.left = "20px";
+  }
+}
+async function startGame(){
+  bet = Math.max(10, parseInt(document.getElementById("betAmt").value)||10);
+  if(window.balance < bet){ alert("Balance kam hai - Admin se Add karwao"); return; }
+  try{ await window.fbDeduct(bet, `Chicken Road Bet - ${difficulty}`); }catch(e){ alert(e.message); return; }
+  window.balance -= bet; updateBal();
+  currentLane = -1; isPlaying = true; wonAmount = 0;
+  buildRoad();
+  document.getElementById("startBtn").style.display="none";
+  document.getElementById("goBtn").style.display="block";
+  document.getElementById("cashBtn").style.display="none";
+}
+function goNext(){
+  if(!isPlaying) return;
+  currentLane++;
+  const cfg = diffSettings[difficulty];
+  if(currentLane >= cfg.lanes){ cashout(true); return; }
+  updateChickenPos(currentLane);
+  let lane = document.getElementById("lane-"+currentLane);
+  lane.classList.add("active");
+  setTimeout(async ()=>{
+    if(traps[currentLane]){
+      lane.innerHTML+=`<span style="margin-left:60px">💥🔥 TRAP!</span>`;
+      isPlaying=false;
+      document.getElementById("goBtn").style.display="none";
+      document.getElementById("startBtn").style.display="block";
+      document.getElementById("startBtn").innerText="RESTART 🔄 - LOST "+bet;
+      // loss already deducted, no extra history needed - but log dead
+      try{
+        const now=new Date();
+        const { doc, updateDoc, arrayUnion } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+        const { db } = await import('../firebase.js');
+        await updateDoc(doc(db,"clients",window.fbUsername),{
+          history: arrayUnion({date:now.toLocaleString("en-IN"), day:now.toLocaleDateString("en-IN"), iso:now.toISOString(), amount:bet, type:"INFO", reason:`Chicken Dead Lane ${currentLane+1}`, ref:"DEAD-"+Date.now().toString().slice(-6), balance:window.balance})
+        });
+      }catch(e){}
+      alert("💥 Chicken mar gaya! "+bet+" loss");
+    } else {
+      lane.classList.remove("active"); lane.classList.add("done");
+      wonAmount = Math.floor(bet * multipliers[currentLane]);
+      document.getElementById("cashAmt").innerText = wonAmount;
+      document.getElementById("cashBtn").style.display="block";
+      if(currentLane === cfg.lanes-1){ document.getElementById("goBtn").innerText="FINISH 🏁"; }
+    }
+  },300);
+}
+async function cashout(isFinish=false){
+  if(!isPlaying &&!isFinish) return;
+  if(wonAmount<=0) wonAmount = Math.floor(bet * (multipliers[currentLane]||1));
+  try{ await window.fbAdd(wonAmount, `Chicken Road Win ${multipliers[currentLane]}x`, multipliers[currentLane]); }catch(e){ alert(e.message); return; }
+  window.balance += wonAmount; updateBal();
+  isPlaying=false;
+  document.getElementById("goBtn").style.display="none";
+  document.getElementById("cashBtn").style.display="none";
+  document.getElementById("startBtn").style.display="block";
+  document.getElementById("startBtn").innerText = "PLAY AGAIN - WIN "+wonAmount+" 💰";
+  if(isFinish) alert("🏆 JACKPOT! "+wonAmount+" win!");
+}
+buildRoad();
+</script>
+</body>
+</html>
