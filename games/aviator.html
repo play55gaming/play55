@@ -34,90 +34,42 @@
 <button onclick="closeFair()">CLOSE</button>
 </div></div>
 
-<script type="module">
-// === FIREBASE LIVE BALANCE ===
 import { db } from '../firebase.js';
 import { doc, getDoc, updateDoc, increment, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const username = (localStorage.getItem("play55_current_user")||"demo").toLowerCase();
-window.fbUsername = username;
-let fbCoins = 0;
-let fbLoaded = false;
+let localBal = parseInt(localStorage.getItem("play55_balance")||"0");
+const username = (localStorage.getItem("play55_current_user")||"demo").trim().toLowerCase();
+let fbCoins = localBal;
+window.userBalance = localBal;
+document.getElementById("balBadge").textContent = localBal+" INN ●";
 
 async function initFirebaseBalance(){
   const ref = doc(db,"clients",username);
   const snap = await getDoc(ref);
-  if(!snap.exists()){
-    document.getElementById("balBadge").textContent = "0 INN ●";
-    return;
-  }
-  const data = snap.data();
-  fbCoins = data.coins||0;
-  fbLoaded = true;
+  if(!snap.exists()) return;
+  fbCoins = snap.data().coins||localBal;
   window.userBalance = fbCoins;
   document.getElementById("balBadge").textContent = Math.floor(fbCoins)+" INN ●";
-  document.getElementById("hdrUser").textContent = data.username.toUpperCase()+" ▼";
-  // Live sync - admin coin add karega to turant update
-  onSnapshot(ref,(s)=>{
-    if(s.exists()){
-      const d=s.data();
-      fbCoins = d.coins||0;
-      window.userBalance = fbCoins;
-      document.getElementById("balBadge").textContent = Math.floor(fbCoins)+" INN ●";
-      localStorage.setItem("play55_balance",Math.floor(fbCoins));
-    }
+  onSnapshot(ref,s=>{
+    if(!s.exists()) return;
+    if((s.data().coins||0)==0 && fbCoins>10) return;
+    fbCoins = s.data().coins||0;
+    window.userBalance = fbCoins;
+    document.getElementById("balBadge").textContent = Math.floor(fbCoins)+" INN ●";
+    localStorage.setItem("play55_balance",Math.floor(fbCoins));
   });
 }
-
-window.syncBalanceToMain = async(newBal)=>{ /* local only */
-  localStorage.setItem("play55_balance", newBal);
-  document.getElementById("balBadge").textContent = Math.floor(newBal)+" INN ●";
-}
-
-window.fbDeduct = async(amt, reason)=>{
-  const now=new Date();
-  const ref=doc(db,"clients",username);
-  await updateDoc(ref,{
-    coins: increment(-amt),
-    history: arrayUnion({
-      date: now.toLocaleString("en-IN"),
-      day: now.toLocaleDateString("en-IN"),
-      iso: now.toISOString(),
-      time: now.toLocaleString(),
-      amount: amt,
-      type: "CUT",
-      reason: reason||"Aviator Bet",
-      ref: "BET-"+Date.now().toString().slice(-6),
-      balance: fbCoins-amt
-    })
-  });
-}
-window.fbAdd = async(amt, reason, crashVal)=>{
-  const now=new Date();
-  const ref=doc(db,"clients",username);
-  await updateDoc(ref,{
-    coins: increment(amt),
-    history: arrayUnion({
-      date: now.toLocaleString("en-IN"),
-      day: now.toLocaleDateString("en-IN"),
-      iso: now.toISOString(),
-      time: now.toLocaleString(),
-      amount: amt,
-      type: "ADD",
-      reason: reason||`Win ${crashVal}x`,
-      ref: "WIN-"+Date.now().toString().slice(-6),
-      balance: fbCoins+amt,
-      game: "AVIATOR",
-      crash: crashVal
-    })
-  });
-}
-
+window.syncBalanceToMain = (b)=>{localStorage.setItem("play55_balance",b); document.getElementById("balBadge").textContent = Math.floor(b)+" INN ●";}
+window.fbDeduct = async(a,r)=>{await updateDoc(doc(db,"clients",username),{coins:increment(-a), history:arrayUnion({amount:a,type:"CUT",reason:r,date:new Date().toLocaleString()})})}
+window.fbAdd = async(a,r,c)=>{await updateDoc(doc(db,"clients",username),{coins:increment(a), history:arrayUnion({amount:a,type:"ADD",reason:r,date:new Date().toLocaleString()})})}
 initFirebaseBalance();
 </script>
 
 <script>
-function goBack(){ window.location.href='../index.html'; }
+function goBack(){ 
+  localStorage.setItem("play55_from_game","1");
+  location.href='../index.html'; 
+}
 const canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
 function rs(){let r=canvas.getBoundingClientRect();canvas.width=r.width*(window.devicePixelRatio||1);canvas.height=r.height*(window.devicePixelRatio||1);ctx.setTransform(window.devicePixelRatio||1,0,0,window.devicePixelRatio||1,0,0)}
 addEventListener('resize',rs);rs();
@@ -125,8 +77,6 @@ let stars=[];for(let i=0;i<100;i++)stars.push({x:Math.random(),y:Math.random(),s
 let phase='waiting', mult=1, crash=2.34, t=0, path=[], plane={x:20,y:0}, raf, hist=[], canBet=true;
 let bets=[{amt:10,placed:false},{amt:10,placed:false}], startTime=0, lastCrash=2.34;
 let livePlayers=[];
-window.userBalance = parseInt(localStorage.getItem("play55_balance") || "1000");
-
 let autoCash=[2.0,2.0], autoOn=[false,false];
 
 function randStr(len=16){let c="abcdefghijklmnopqrstuvwxyz0123456789";let s="";for(let i=0;i<len;i++) s+=c[Math.floor(Math.random()*c.length)]; return s;}

@@ -48,7 +48,7 @@ body{background:#000;color:#fff;overflow:hidden;height:100dvh}
 <canvas id="mainCanvas"></canvas>
 <div class="top">
 <div class="logo"><i>55</i> Play55 • CRASH 3D</div>
-<div style="display:flex;gap:8px;align-items:center"><div class="bal">🪙 <span id="bal">0</span></div><button class="backBtnTop" onclick="location.href='../index.html'">← BACK</button></div>
+<div style="display:flex;gap:8px;align-items:center"><div class="bal">🪙 <span id="bal">0</span></div><button class="backBtnTop" onclick="goBack()">← BACK</button></div>
 </div>
 <div class="leftLive" id="liveBoard"></div>
 <div class="rightHistory" id="history"></div>
@@ -103,6 +103,7 @@ initBal();
 </script>
 
 <script>
+function goBack(){ localStorage.setItem("play55_from_game","1"); location.href='../index.html'; }
 let balance=1000;
 let bet=100,isFlying=false,currMult=1.0,crashPoint=2.45,loop=null,won=0,hasBet=false,hasCashed=false,autoMode=false,autoCashVal=2.0;
 let historyData=JSON.parse(localStorage.getItem("play55_crash_history")||"[2.45,1.12,5.2,1.01,3.33,12.5,1.8,2.1]");

@@ -106,7 +106,7 @@ initBal();
 </script>
 
 <script>
-function goBack(){ window.location.href='../index.html'; }
+function goBack(){ localStorage.setItem("play55_from_game","1"); window.location.href='../index.html'; }
 function mask(){const p=["go","ra","sk","vi","an","ro","pr","mu","ji","ak"]; return `${p[Math.floor(Math.random()*p.length)]}***${Math.floor(Math.random()*90)+10}`}
 const cv=document.getElementById("cv"), ctx=cv.getContext("2d"), multEl=document.getElementById("mult"), plane=document.getElementById("plane"), statusEl=document.getElementById("status"), gBox=document.getElementById("gBox");
 function resize(){cv.width=gBox.offsetWidth*2; cv.height=gBox.offsetHeight*2} resize();

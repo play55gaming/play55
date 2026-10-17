@@ -25,7 +25,7 @@ body{background:#070a1a;color:#fff;height:100dvh;overflow:hidden;display:flex;fl
 </head>
 <body>
 <div class="top">
-<div class="logo" onclick="location.href='../index.html'">
+<div class="logo" onclick="goBack()">
 <img src="../images/plinko.webp" onerror="this.style.display='none'" alt="dp">
 <span>Play55</span> PLINKO</div>
 <div class="bal">🪙 <span id="balVal">0</span></div>
@@ -39,7 +39,7 @@ body{background:#070a1a;color:#fff;height:100dvh;overflow:hidden;display:flex;fl
 <div style="margin-top:4px;display:flex;justify-content:space-between;font-size:11px"><span>BET: <b id="betTxt">10 INN</b></span><span id="last">Last: -</span></div>
 <button class="betBtn" id="dropBtn" onclick="drop()">DROP BALL</button>
 <div class="win" id="win"></div>
-<div class="backBtn" onclick="location.href='../index.html'">← Back to Home</div>
+<div class="backBtn" onclick="goBack()">← Back to Home</div>
 </div>
 </div>
 
@@ -232,6 +232,7 @@ async function drop(){
     }
   },19);
 }
+function goBack(){ localStorage.setItem("play55_from_game","1"); location.href='../index.html'; }
 </script>
 </body>
 </html>

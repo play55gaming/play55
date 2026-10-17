@@ -55,7 +55,7 @@ body{background:#070f13;color:#fff;overflow-x:hidden}
 <button id="goBtn" class="btnGo" style="display:none" onclick="goNext()">GO NEXT ➜</button>
 <button id="cashBtn" class="btnCash" onclick="cashout()">CASHOUT 💰 <span id="cashAmt">0</span></button>
 <div style="display:flex;gap:8px;margin-top:10px">
-<button onclick="location.href='../index.html'" style="flex:1;padding:10px;border-radius:10px;background:transparent;border:1px solid #ffcc00;color:#ffcc00;font-weight:900">BACK</button>
+<button onclick="goBack()" style="flex:1;padding:10px;border-radius:10px;background:transparent;border:1px solid #ffcc00;color:#ffcc00;font-weight:900">BACK</button>
 </div>
 </div>
 </div>
@@ -103,6 +103,7 @@ initBal();
 </script>
 
 <script>
+function goBack(){ localStorage.setItem("play55_from_game","1"); location.href='../index.html'; }
 let balance = 1000;
 let bet = 100;
 let currentLane = -1;

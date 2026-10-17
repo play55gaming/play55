@@ -45,6 +45,21 @@ button{border:0;padding:11px 16px;border-radius:8px;cursor:pointer;font-weight:b
 .filterBtn.active{background:#111827;color:#fff}
 #toast.show{display:block !important; animation: slideDown 0.3s ease;}
 @keyframes slideDown{from{top:0; opacity:0} to{top:30px; opacity:1}}
+.grid10{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.gitem{padding:10px;text-align:center;border:1px solid #333;border-radius:10px;cursor:pointer;background:#111;font-weight:700;font-size:13px;user-select:none;color:#fff}
+.gitem.sel{background:gold;color:#000;border-color:gold}
+.logoBox{display:flex;gap:8px;align-items:center}
+.logoBox input[type=file]{background:#222}
+.preview{width:42px;height:42px;border-radius:50%;background:#fff;object-fit:cover;border:2px solid gold;display:none}
+.bannerPreview{background:#000;border:2px solid #ff6a00;border-radius:18px;height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;margin-top:10px}
+.teamLogo{width:70px;height:70px;border-radius:50%;background:#fff;object-fit:cover;border:2px solid gold}
+.editing{border:2px solid lime!important}
+.apiBox{background:#0b1220;border:1px dashed gold;padding:8px;border-radius:10px;margin:6px 0}
+.fancyRow{background:#0b1220;padding:8px;border-radius:8px;margin:6px 0;border:1px dashed #555;color:#fff}
+.btn{padding:12px;width:100%;background:gold;color:#000;font-weight:900;border:none;border-radius:10px;cursor:pointer;margin-top:8px}
+.btn-small{padding:5px 8px;font-size:11px;border-radius:6px;border:none;cursor:pointer;font-weight:700;margin:2px}
+
+
 </style>
 </head>
 <body>
@@ -80,7 +95,9 @@ button{border:0;padding:11px 16px;border-radius:8px;cursor:pointer;font-weight:b
   <div class="tab" onclick="switchTab('settings')" id="tab-settings">⚙️ Settings</div>
 <div class="tab" onclick="switchTab('deposits')" id="tab-deposits">💰 Deposits</div>
 <div class="tab" onclick="switchTab('withdrawals')" id="tab-withdrawals">🏧 Withdrawals</div>
+<div class="tab" onclick="switchTab('apis')" id="tab-apis">🌐 5 API Settings</div>
 </div>
+
 <div id="status" class="status">Firebase Ready | play55-fea54 | All Buttons Clickable</div>
 
 <div id="section-dashboard" class="card">
@@ -139,36 +156,81 @@ button{border:0;padding:11px 16px;border-radius:8px;cursor:pointer;font-weight:b
   <div id="checkedUserResult"></div>
 </div>
 
-<div id="section-matches" class="card hidden">
-  <h2>Match Control</h2>
-  <button class="addBtn" onclick="showAddForm()">+ Add Match</button>
-  <button class="resetBtn" onclick="resetMatches()">Reset Demo</button>
-  <br><br>
-  <div class="card hidden" id="matchForm" style="border:2px solid #2563eb">
-    <h2 id="formTitle">Add Match</h2>
-    <input type="hidden" id="editId">
-    <input type="text" id="matchName" placeholder="Match Name">
-    <div class="grid2"><input type="text" id="team1" placeholder="Team 1"><input type="text" id="team2" placeholder="Team 2"></div>
-    <div class="grid2">
-      <select id="matchSport"><option value="CRICKET">CRICKET</option><option value="FOOTBALL">FOOTBALL</option><option value="TENNIS">TENNIS</option><option value="CASINO">CASINO</option></select>
-      <select id="matchType"><option value="LIVE">LIVE</option><option value="UPCOMING">UPCOMING</option><option value="VIRTUAL">VIRTUAL</option><option value="PREMIUM">PREMIUM</option></select>
-    </div>
-    <div class="grid2">
-      <select id="matchCat"><option value="SPORTS">SPORTS</option><option value="PREMIUM">PREMIUM</option></select>
-      <select id="matchStatus"><option value="UPCOMING">UPCOMING</option><option value="LIVE">LIVE</option><option value="ENDED">ENDED</option></select>
-    </div>
-    <input type="text" id="matchTime" placeholder="Match Time">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-      <input type="text" id="odd0" placeholder="1"><input type="text" id="odd1" placeholder="X"><input type="text" id="odd2" placeholder="2">
-      <input type="text" id="odd3" placeholder="-"><input type="text" id="odd4" placeholder="-"><input type="text" id="odd5" placeholder="-">
-    </div><br>
-    <button class="saveBtn" onclick="saveMatch()">Save</button>
-    <button class="resetBtn" onclick="hideForm()">Cancel</button>
-  </div>
-  <div id="matchList"></div>
+<div id="section-matches" class="hidden">
+<div id="step1" class="card">
+<h3>1. Game Select Karo</h3>
+<div class="grid10" id="gameGrid"></div>
+<div id="selGame" style="margin-top:10px;color:gold;font-weight:900">Selected: Cricket</div>
 </div>
 
-<div id="section-settings" class="card hidden">
+<div id="step2" class="card formCard" >
+<h3 id="formTitle">2. Match Details - New Match</h3>
+<input id="team1" placeholder="Team 1 Name e.g. India">
+<div class="logoBox">
+  <input id="logo1File" type="file" accept="image/*">
+  <input id="logo1" placeholder="Ya Logo URL paste karo">
+  <img id="logo1Prev" class="preview">
+</div>
+<input id="team2" placeholder="Team 2 Name e.g. Australia">
+<div class="logoBox">
+  <input id="logo2File" type="file" accept="image/*">
+  <input id="logo2" placeholder="Ya Logo URL paste karo">
+  <img id="logo2Prev" class="preview">
+</div>
+<input id="title" placeholder="Match Title e.g. 1st ODI">
+<!-- NEW FIELDS - CricAPI -->
+<div class="apiBox">
+  <small style="color:gold">CricFy jaisa + API ke liye (optional hai)</small>
+  <input id="league" placeholder="League Name e.g. ICC CWC LEAGUE 2">
+  <input id="apiId" placeholder="CricAPI Match ID e.g. 12345 ya EntitySports ID">
+  <select id="apiSource"><option value="manual">Manual (Admin Time se)</option><option value="cricapi">CricAPI (cricketdata.org)</option><option value="rapidapi">RapidAPI EntitySports</option></select>
+  <input id="apiKey" placeholder="API Key yaha paste karo (agar hai to) - optional">
+</div>
+<input id="mTime" type="datetime-local">
+<select id="status">
+  <option value="upcoming">Upcoming</option>
+  <option value="live">Live</option>
+  <option value="ended">Ended</option>
+  <option value="rain">Rain - Barish</option>
+  <option value="delayed">Delayed</option>
+  <option value="abandoned">Abandoned</option>
+  <option value="stumps">Stumps / Lunch</option>
+</select>
+<select id="winnerTeam">
+  <option value="">Winner Select (Ended ke liye)</option>
+  <option value="team1">Team 1 Winner</option>
+  <option value="team2">Team 2 Winner</option>
+  <option value="draw">Draw - Sabko Win</option>
+</select>
+<div class="bannerPreview" id="bannerPrev">
+  <div style="display:flex;gap:30px;align-items:center">
+    <img id="bLogo1" class="teamLogo" style="display:none"><div id="bLogo1Emoji" style="font-size:40px">🏏</div>
+    <div style="text-align:center"><div style="color:gold;font-weight:900">VS</div><div id="bTitle" style="font-size:12px;color:#aaa">Title</div></div>
+    <img id="bLogo2" class="teamLogo" style="display:none"><div id="bLogo2Emoji" style="font-size:40px">🏏</div>
+  </div>
+  <div style="margin-top:10px;display:flex;gap:10px"><span id="bTeam1" style="font-weight:900">Team1</span><span style="color:#ff2d55">•</span><span id="bTeam2" style="font-weight:900">Team2</span></div>
+  <div id="bLeague" style="margin-top:6px;font-size:10px;color:#38bdf8"></div>
+</div>
+</div>
+
+<div id="step3" class="card">
+<h3>3. Fancy / Bet Add Karo</h3>
+<select id="fType"><option value="winner">Winner</option><option value="range">Range</option><option value="overunder">Over/Under</option><option value="custom">Custom</option></select>
+<input id="fTitle" placeholder="Fancy Title e.g. Match Winner">
+<div id="fInputs"></div>
+<button class="btn" style="background:#333;color:#fff" id="addFancyBtn">+ Fancy Add to List</button>
+<div id="fList" style="margin-top:10px"></div>
+</div>
+
+<button class="btn" id="saveBtn">FINAL SAVE MATCH</button>
+<button class="btn" id="cancelBtn" style="background:#444;color:#fff;display:none">Cancel Edit</button>
+<div id="msg" style="text-align:center
+;margin-top:10px;color:lime"></div>
+<div class="card" id="savedList"></div>
+</div>
+
+
+   <div id="section-settings" class="card hidden">
 <h2>📞 Support Settings</h2>
 <input type="text" id="waDemo" placeholder="Demo Support Number" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid #ccd3dd;border-radius:8px;">
 <input type="text" id="waMain" placeholder="Main Support Number" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid #ccd3dd;border-radius:8px;">
@@ -202,10 +264,15 @@ button{border:0;padding:11px 16px;border-radius:8px;cursor:pointer;font-weight:b
   <h2>🏦 Withdrawal Requests</h2>
   <div id="withdrawRequestsList">Loading withdrawals...</div>
 </div>
+<div id="section-apis" class="card hidden">
+  <h2>🌐 5 API System - Cricket, Football, Tennis, Kabaddi, Custom</h2>
+  <p class="small">Har sport ka alag API Key, ON/OFF, Live 30sec / Normal 5min timer</p>
+  <div id="apiSettingsBox"></div>
+</div>
 </div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, increment, arrayUnion, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, increment, arrayUnion, query, where, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
@@ -340,8 +407,16 @@ const ref=document.getElementById("coinRef").value.trim()||"ADD-"+Date.now().toS
 const reason=document.getElementById("coinReason").value.trim()||"Admin Add"; 
 if(!amt||amt<=0){alert("Amount daalo");return;} 
 const now=new Date(); 
-await updateDoc(doc(db,"clients",username),{coins:increment(amt),history:arrayUnion({type:"ADD",amount:amt,reason,ref,time:now.toLocaleString(),iso:now.toISOString(),date:now.toLocaleDateString()})}); 
-alert("Added "+amt); checkUser();
+await updateDoc(doc(db,"clients",username),{coins:increment(amt)}); 
+await addDoc(collection(db,"deposits"),{
+  username: username,
+  amount: amt,
+  utr: ref,
+  method: "Admin Credit",
+  status: "approved",
+  time: now.toISOString()
+});
+alert("Added "+amt+" + Deposited"); checkUser();
 }
 window.cutCoins=async(username)=>{
 const amt=parseInt(document.getElementById("coinAmount").value); 
@@ -349,8 +424,17 @@ const ref=document.getElementById("coinRef").value.trim()||"CUT-"+Date.now().toS
 const reason=document.getElementById("coinReason").value.trim()||"Admin Cut"; 
 if(!amt||amt<=0){alert("Amount daalo");return;} 
 const now=new Date(); 
-await updateDoc(doc(db,"clients",username),{coins:increment(-amt),history:arrayUnion({type:"CUT",amount:amt,reason,ref,time:now.toLocaleString(),iso:now.toISOString(),date:now.toLocaleDateString()})}); 
-alert("Cut "+amt); checkUser();
+await updateDoc(doc(db,"clients",username),{coins:increment(-amt)}); 
+await addDoc(collection(db,"withdrawals"),{
+  username: username,
+  amount: amt,
+  accNo: ref,
+  method: "Admin Debit",
+  status: "approved",
+  time: now.toISOString(),
+  utr: ref
+});
+alert("Cut "+amt+" + Withdraw success"); checkUser();
 }
 window.suspendUser=async(username)=>{
 let reason=prompt("Suspend Reason:","Contact Admin"); if(reason===null) return; 
@@ -384,9 +468,13 @@ window.loadDashboard=async()=>{
   document.getElementById('recentVisits').innerHTML=visits.slice(-20).reverse().map(v=>`<div class="hist-item">${v.time}</div>`).join('')||"No visits - index.html me logger lagao";
   document.getElementById('recentRegs').innerHTML=users.slice(-20).reverse().map(u=>`<div class="hist-item"><b>${u.username}</b> - ${u.mobile}</div>`).join('');
 }
-window.switchTab=(t)=>{document.querySelectorAll(".tab").forEach(e=>e.classList.remove("active")); document.getElementById("tab-"+t).classList.add("active"); ["dashboard","users","check","matches","settings","deposits","withdrawals"].forEach(x=>document.getElementById("section-"+x).classList.add("hidden")); document.getElementById("section-"+t).classList.remove("hidden"); if(t==='dashboard') loadDashboard();
+window.switchTab=(t)=>{document.querySelectorAll(".tab").forEach(e=>e.classList.remove("active")); document.getElementById("tab-"+t).classList.add("active"); 
+["dashboard","users","check","matches","settings","deposits","withdrawals","apis"].forEach(x=>document.getElementById("section-"+x).classList.add("hidden"));
+document.getElementById("section-"+t).classList.remove("hidden"); if(t==='dashboard') loadDashboard();
 if(t==='deposits') loadDeposits();
-if(t==='withdrawals') loadWithdrawals();}
+if(t==='withdrawals') loadWithdrawals();
+if(t==='apis') renderApiBoxes();
+}
 
 window.loadDeposits = async()=>{
   const listDiv = document.getElementById("depositRequestsList");
@@ -471,38 +559,183 @@ window.rejectWithdraw = async(id)=>{
 window.setStatus=(m)=>document.getElementById("status").innerText=m;
 window.esc=(v)=>String(v||'').replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
-// ---- MATCHES & SETTINGS - FINAL FIXED ----
-async function getMatches(){try{const snap=await getDoc(doc(db,"settings","main")); if(snap.exists() && snap.data().matches) return snap.data().matches;}catch(e){} return defaultMatches;}
-async function saveMatches(m){await setDoc(doc(db,"settings","main"),{matches:m},{merge:true});}
-
-window.renderMatches=async()=>{
-  const ms=await getMatches();
-  const list=document.getElementById("matchList");
-  if(!list) return;
-  list.innerHTML=ms.map((match,i)=>`<div class="match"><b>${match.title}</b> - ${match.status}<br><button class="editBtn" onclick="editMatch(${i})">Edit</button><button class="deleteBtn" onclick="deleteMatch(${i})">Delete</button></div>`).join("");
+let games=["Cricket","Football","Tennis","Kabaddi","Boxing","Car Racing","Basketball","Volleyball","Badminton","eSports"];
+let selectedSport="cricket"; let fancies=[]; let logo1Data="", logo2Data="";
+let editIndex = -1;
+let grid=document.getElementById('gameGrid');
+grid.innerHTML=games.map(g=>`<div class="gitem" data-g="${g.toLowerCase()}">${g}</div>`).join('');
+function selectGame(el){
+  document.querySelectorAll('.gitem').forEach(x=>x.classList.remove('sel'));
+  el.classList.add('sel'); selectedSport=el.dataset.g;
+  document.getElementById('selGame').innerText="Selected: "+el.innerText;
 }
-window.showAddForm=()=>{document.getElementById("matchForm")?.classList.remove("hidden");}
-window.hideForm=()=>document.getElementById("matchForm")?.classList.add("hidden");
-window.saveMatch=async()=>{
-  const name=document.getElementById("matchName")?.value?.trim();
-  if(!name){alert("Match name daalo"); return;}
-  const ms=await getMatches();
-  ms.push({title:name,date:document.getElementById("matchTime")?.value||"",sport:document.getElementById("matchSport")?.value||"CRICKET",type:document.getElementById("matchType")?.value||"LIVE",cat:document.getElementById("matchCat")?.value||"SPORTS",status:document.getElementById("matchStatus")?.value||"LIVE",odds:[0,1,2,3,4,5].map(i=>document.getElementById("odd"+i)?.value||"-")});
-  await saveMatches(ms); renderMatches(); hideForm();
+document.querySelectorAll('.gitem').forEach(el=>{ el.addEventListener('click', ()=> selectGame(el)); });
+let def = document.querySelector('[data-g="cricket"]'); if(def) def.classList.add('sel');
+function handleFile(input, previewId, bannerId, bannerEmojiId, setDataFn){
+  input.addEventListener('change', e=>{
+    let file=e.target.files[0]; if(!file) return;
+    let reader=new FileReader();
+    reader.onload=ev=>{
+      let base64=ev.target.result; setDataFn(base64);
+      document.getElementById(previewId).src=base64; document.getElementById(previewId).style.display='block';
+      document.getElementById(bannerId).src=base64; document.getElementById(bannerId).style.display='block';
+      document.getElementById(bannerEmojiId).style.display='none'; updateBanner();
+    }; reader.readAsDataURL(file);
+  });
 }
-window.editMatch=async(i)=>{const ms=await getMatches(); const m=ms[i]; document.getElementById("matchForm")?.classList.remove("hidden"); document.getElementById("editId").value=i; document.getElementById("matchName").value=m.title;}
-window.deleteMatch=async(i)=>{if(!confirm("Delete?")) return; const ms=await getMatches(); ms.splice(i,1); await saveMatches(ms); renderMatches();}
-window.resetMatches=async()=>{await saveMatches(defaultMatches); renderMatches();};
+handleFile(document.getElementById('logo1File'),'logo1Prev','bLogo1','bLogo1Emoji', v=>logo1Data=v);
+handleFile(document.getElementById('logo2File'),'logo2Prev','bLogo2','bLogo2Emoji', v=>logo2Data=v);
+function handleUrl(input, previewId, bannerId, bannerEmojiId, setDataFn){
+  input.addEventListener('input', e=>{
+    let url=e.target.value.trim(); if(!url) return; setDataFn(url);
+    document.getElementById(previewId).src=url; document.getElementById(previewId).style.display='block';
+    document.getElementById(bannerId).src=url; document.getElementById(bannerId).style.display='block';
+    document.getElementById(bannerEmojiId).style.display='none'; updateBanner();
+  });
+}
+handleUrl(document.getElementById('logo1'),'logo1Prev','bLogo1','bLogo1Emoji', v=>logo1Data=v);
+handleUrl(document.getElementById('logo2'),'logo2Prev','bLogo2','bLogo2Emoji', v=>logo2Data=v);
+function updateBanner(){
+  document.getElementById('bTeam1').innerText=document.getElementById('team1').value||'Team1';
+  document.getElementById('bTeam2').innerText=document.getElementById('team2').value||'Team2';
+  document.getElementById('bTitle').innerText=document.getElementById('title').value||'VS MATCH';
+  document.getElementById('bLeague').innerText=document.getElementById('league').value||'';
+}
+['team1','team2','title','league'].forEach(id=>document.getElementById(id).addEventListener('input', updateBanner));
+const fType = document.getElementById('fType'); const fInputs = document.getElementById('fInputs');
+function renderFInputs(){
+ let t=fType.value;
+ if(t=='winner') fInputs.innerHTML=`<input id="t1Bet" placeholder="Team1 Bet"><input id="t1Win" placeholder="Team1 Win"><input id="t2Bet" placeholder="Team2 Bet"><input id="t2Win" placeholder="Team2 Win">`;
+ else if(t=='range') fInputs.innerHTML=`<input id="bet" placeholder="Bet"><input id="win" placeholder="Win"><input id="rule" placeholder="Rule">`;
+ else if(t=='overunder') fInputs.innerHTML=`<input id="overWin" placeholder="Over Win"><input id="underWin" placeholder="Under Win">`;
+ else fInputs.innerHTML=`<input id="rule" placeholder="Rule"><input id="opt1" placeholder="Opt1"><input id="opt2" placeholder="Opt2"><input id="bet" placeholder="Bet">`;
+}
+fType.addEventListener('change', renderFInputs); renderFInputs();
+document.getElementById('addFancyBtn').addEventListener('click', ()=>{
+ let t=fType.value, title=document.getElementById('fTitle').value||'Fancy'; let obj={type:t, title};
+ if(t=='winner'){ obj.team1Bet=document.getElementById('t1Bet')?.value||''; obj.team1Win=document.getElementById('t1Win')?.value||''; obj.team2Bet=document.getElementById('t2Bet')?.value||''; obj.team2Win=document.getElementById('t2Win')?.value||''; }
+ else if(t=='range'){ obj.bet=document.getElementById('bet')?.value||''; obj.win=document.getElementById('win')?.value||''; obj.rule=document.getElementById('rule')?.value||''; }
+ else if(t=='overunder'){ obj.overWin=document.getElementById('overWin')?.value||''; obj.underWin=document.getElementById('underWin')?.value||''; }
+ else { obj.rule=document.getElementById('rule')?.value||''; obj.opt1=document.getElementById('opt1')?.value||''; obj.opt2=document.getElementById('opt2')?.value||''; obj.bet=document.getElementById('bet')?.value||''; }
+ fancies.push(obj); renderFancyList(); document.getElementById('fTitle').value='';
+});
+function renderFancyList(){
+ document.getElementById('fList').innerHTML=fancies.map((f,i)=>`<div class="fancyRow">${i+1}. ${f.title} [${f.type}] <span style="float:right;color:red;cursor:pointer" data-i="${i}">X</span></div>`).join('');
+ document.querySelectorAll('.fancyRow span').forEach(s=> s.onclick=()=>{ fancies.splice(s.dataset.i,1); renderFancyList(); });
+}
+function showSaved(){
+ let arr=JSON.parse(localStorage.getItem('cricTeamMatches')||'[]');
+ document.getElementById('savedList').innerHTML = `<h3>Saved Matches (${arr.length})</h3>` + arr.map((m,i)=> `
+  <div style="padding:8px;border-bottom:1px solid #333;background:${editIndex==i?'#1a3a1a':''}">
+    <div style="display:flex;align-items:center;gap:8px">
+      <img src="${m.logo1}" style="width:30px;height:30px;border-radius:50%;background:#fff;object-fit:cover">
+      <b>${m.sport} - ${m.team1} vs ${m.team2}</b> <small style="color:gold">[${(m.status||'').toUpperCase()}]</small>
+      <img src="${m.logo2}" style="width:30px;height:30px;border-radius:50%;background:#fff;object-fit:cover;margin-left:auto">
+    </div>
+    <small style="color:#aaa">${m.league||''} | API:${m.apiId||'manual'} [${m.apiSource||'manual'}]</small>
+    <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">
+      <button class="btn-small" style="background:#38bdf8" onclick="editMatch(${i})">Edit</button>
+      <button class="btn-small" style="background:#22c55e" onclick="quickStatus(${i},'live')">Live</button>
+      <button class="btn-small" style="background:#eab308" onclick="quickStatus(${i},'rain')">Rain</button>
+      <button class="btn-small" style="background:#f97316" onclick="quickStatus(${i},'delayed')">Delay</button>
+      <button class="btn-small" style="background:#ef4444" onclick="quickStatus(${i},'ended')">End</button>
+      <button class="btn-small" style="background:#333;color:#fff" onclick="deleteMatch(${i})">Delete</button>
+    </div>
+  </div>`).join('');
+}
+window.editMatch=(i)=>{
+ let arr=JSON.parse(localStorage.getItem('cricTeamMatches')||'[]'); let m=arr[i];
+ editIndex=i;
+ document.getElementById('team1').value=m.team1; document.getElementById('team2').value=m.team2;
+ document.getElementById('logo1').value=m.logo1||''; document.getElementById('logo2').value=m.logo2||'';
+ logo1Data=m.logo1||''; logo2Data=m.logo2||'';
+ document.getElementById('title').value=m.title||''; document.getElementById('status').value=m.status||'upcoming';
+ document.getElementById('league').value=m.league||''; document.getElementById('apiId').value=m.apiId||''; document.getElementById('apiSource').value=m.apiSource||'manual'; document.getElementById('apiKey').value=m.apiKey||'';
+ document.getElementById('logo1Prev').src=m.logo1||''; document.getElementById('logo1Prev').style.display=m.logo1?'block':'none';
+ document.getElementById('logo2Prev').src=m.logo2||''; document.getElementById('logo2Prev').style.display=m.logo2?'block':'none';
+ document.getElementById('bLogo1').src=m.logo1||''; document.getElementById('bLogo1').style.display=m.logo1?'block':'none';
+ document.getElementById('bLogo2').src=m.logo2||''; document.getElementById('bLogo2').style.display=m.logo2?'block':'none';
+ if(m.logo1) document.getElementById('bLogo1Emoji').style.display='none';
+ if(m.logo2) document.getElementById('bLogo2Emoji').style.display='none';
+ fancies=m.fancies||[]; renderFancyList(); updateBanner();
+ document.querySelectorAll('.gitem').forEach(x=>{ x.classList.remove('sel'); if(x.dataset.g==m.sport) x.classList.add('sel'); });
+ selectedSport=m.sport;
+ document.getElementById('formCard').classList.add('editing');
+ document.getElementById('formTitle').innerText=`2. Edit Match - ${m.team1} vs ${m.team2}`;
+ document.getElementById('saveBtn').innerText='UPDATE MATCH';
+ document.getElementById('cancelBtn').style.display='block';
+ window.scrollTo(0,0); showSaved();
+}
+window.quickStatus=(i, newStatus)=>{
+ let arr=JSON.parse(localStorage.getItem('cricTeamMatches')||'[]');
+ arr[i].status=newStatus; localStorage.setItem('cricTeamMatches', JSON.stringify(arr)); showSaved();
+ tryUpdateFirebase(arr[i], {status:newStatus});
+ document.getElementById('msg').innerText=`✅ ${arr[i].team1} vs ${arr[i].team2} -> ${newStatus.toUpperCase()}`;
+}
+window.deleteMatch=(i)=>{
+ if(!confirm("Delete karna hai?")) return;
+ let arr=JSON.parse(localStorage.getItem('cricTeamMatches')||'[]'); arr.splice(i,1);
+ localStorage.setItem('cricTeamMatches', JSON.stringify(arr)); showSaved();
+}
+async function tryUpdateFirebase(localData, patch){
+ try{
+  const { db } = await import("../firebase.js");
+  const { collection, query, where, getDocs, updateDoc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+  let q = query(collection(db,"cricTeamMatches"), where("team1","==",localData.team1), where("team2","==",localData.team2));
+  let snap = await getDocs(q);
+  snap.forEach(d=> updateDoc(d.ref, patch));
+ }catch(e){ console.log("fb update skip", e.message); }
+}
+document.getElementById('cancelBtn').addEventListener('click', ()=>{
+ editIndex=-1; fancies=[]; renderFancyList(); showSaved();
+ document.getElementById('formCard').classList.remove('editing');
+ document.getElementById('formTitle').innerText='2. Match Details - New Match';
+ document.getElementById('saveBtn').innerText='FINAL SAVE MATCH';
+ document.getElementById('cancelBtn').style.display='none';
+ ['team1','team2','logo1','logo2','title','mTime','league','apiId','apiKey'].forEach(id=>document.getElementById(id).value='');
+});
+showSaved();
+document.getElementById('saveBtn').addEventListener('click', async ()=>{
+// 9TH POINT ADD - Upar add kiya hai isliye niche use kar sakte hain
+  const autoBetsForMatch = [
+    {title: `Match Winner - ${document.getElementById('team1').value}`, team1Bet: '100', team1Win: '185', team2Bet: '100', team2Win: '190', type: 'winner', isAuto: true},
+    {title: 'Total Sixes Over 10.5', bet: '100', win: '195', type: 'range', isAuto: true}
+  ];
+let data={
+  sport:selectedSport, team1:document.getElementById('team1').value, team2:document.getElementById('team2').value,
+  logo1: logo1Data || document.getElementById('logo1').value, logo2: logo2Data || document.getElementById('logo2').value,
+  title:document.getElementById('title').value, league:document.getElementById('league').value, apiId:document.getElementById('apiId').value, apiSource:document.getElementById('apiSource').value, apiKey:document.getElementById('apiKey').value,
+  mTime:document.getElementById('mTime').value? new Date(document.getElementById('mTime').value).toISOString() : new Date().toISOString(),
+  status:document.getElementById('status').value,
+  winner: document.getElementById('winnerTeam').value, // <--- ye line add
+  endedAt: document.getElementById('status').value=='ended' ? Date.now() : 0, // <--- ye line add
+  fancies: [...fancies, ...autoBetsForMatch], autoBets: autoBetsForMatch, isAutoBetEnabled: true, createdAt: Date.now()
+ };
 
+ if(!data.team1 ||!data.team2){ alert("Team naam likh"); return; }
+ try{
+   const snap = await getDoc(doc(db,"settings","main"));
+   let arr = snap.exists() && snap.data().matches? snap.data().matches : [];
+   if(editIndex>=0){ arr[editIndex]=data; document.getElementById('msg').innerText="✅ Match Updated + Firebase"; }
+   else { arr.unshift(data); document.getElementById('msg').innerText="✅ Match Saved + Firebase"; }
+   await setDoc(doc(db,"settings","main"), { matches: arr }, {merge:true});
+   editIndex=-1; fancies=[]; renderFancyList(); showSaved();
+   document.getElementById('formCard').classList.remove('editing');
+   document.getElementById('formTitle').innerText='2. Match Details - New Match';
+   document.getElementById('saveBtn').innerText='FINAL SAVE MATCH';
+   document.getElementById('cancelBtn').style.display='none';
+ }catch(e){ console.log(e); alert("Firebase Error: "+e.message); }
+});
 async function compressAndUpload(file){
-  if(!file) return "";
-  const img = await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=URL.createObjectURL(file);});
-  const c=document.createElement("canvas"); let w=img.width,h=img.height; const max=600;
-  if(w>h){if(w>max){h*=max/w;w=max;}}else{if(h>max){w*=max/h;h=max;}}
-  c.width=w;c.height=h; c.getContext("2d").drawImage(img,0,0,w,h);
-  return c.toDataURL("image/jpeg",0.6);
+ if(!file) return "";
+ const img = await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=URL.createObjectURL(file);});
+ const c=document.createElement("canvas"); let w=img.width,h=img.height; const max=280;
+ if(w>h){if(w>max){h*=max/w;w=max;}}else{if(h>max){w*=max/h;h=max;}}
+ c.width=w;c.height=h; c.getContext("2d").drawImage(img,0,0,w,h);
+ let out = c.toDataURL("image/jpeg",0.5);
+ if(out.length > 200000){ out = c.toDataURL("image/jpeg",0.3); }
+ return out;
 }
-
 document.getElementById("qr1File")?.addEventListener("change",async e=>{
   const url=await compressAndUpload(e.target.files[0]);
   document.getElementById("qr1Preview").src=url;
@@ -516,6 +749,29 @@ document.getElementById("qr2File")?.addEventListener("change",async e=>{
   document.getElementById("qr2Preview").style.display="block";
   document.getElementById("qr2").value=url;
   showToast("QR2 Selected - Save dabao");
+});
+document.getElementById("qr2File")?.addEventListener("change",async e=>{
+  const url=await compressAndUpload(e.target.files[0]);
+  document.getElementById("qr2Preview").src=url;
+  document.getElementById("qr2Preview").style.display="block";
+  document.getElementById("qr2").value=url;
+  // showToast("QR2 Selected - Save dabao");
+});
+
+// === YE NAYA WALA DAAL - GALLERY SE FLAG ===
+document.getElementById("flagAFile")?.addEventListener("change",async e=>{
+  const url=await compressAndUpload(e.target.files[0]);
+  document.getElementById("flagAPreview").src=url;
+  document.getElementById("flagAPreview").style.display="block";
+  document.getElementById("flagA").value=url;
+  showToast("Team A Logo Selected");
+});
+document.getElementById("flagBFile")?.addEventListener("change",async e=>{
+  const url=await compressAndUpload(e.target.files[0]);
+  document.getElementById("flagBPreview").src=url;
+  document.getElementById("flagBPreview").style.display="block";
+  document.getElementById("flagB").value=url;
+  showToast("Team B Logo Selected");
 });
 
 window.saveWhatsapp = async()=>{
@@ -563,7 +819,37 @@ window.loadSettings = async()=>{try{
     if(d.qr2){ document.getElementById("qr2Preview").src=d.qr2; document.getElementById("qr2Preview").style.display="block"; }
   }catch(e){ console.log(e) }
 }
-checkAdminSession(); renderAllUsers(); loadDashboard(); loadSettings(); renderMatches();
+// 8th POINT - 5 API SYSTEM
+const SPORTS = ['cricket','football','tennis','kabaddi','custom'];
+window.renderApiBoxes = async()=>{
+ let html='';
+ const snap = await getDoc(doc(db,"settings","main"));
+ const apiData = snap.exists()? (snap.data().apiSettings || {}) : {};
+ SPORTS.forEach(s=>{
+  let cur = apiData[s] || {apiKey:'', enabled:false, live:30, normal:300};
+  html+=`<div style="border:1px solid #dbe1e8;padding:12px;margin:10px 0;border-radius:10px">
+  <b>${s.toUpperCase()}</b><br>
+  <input id="api_${s}" value="${cur.apiKey}" placeholder="${s} API Key" style="width:70%">
+  <label><input type="checkbox" id="on_${s}" ${cur.enabled?'checked':''}> ON</label><br>
+  Live: <input id="live_${s}" type="number" value="${cur.live}" style="width:60px"> sec
+  Normal: <input id="normal_${s}" type="number" value="${cur.normal}" style="width:70px"> sec
+  <button class="saveBtn" onclick="saveApiSettings('${s}')">Save ${s}</button>
+  </div>`;
+ });
+ document.getElementById('apiSettingsBox').innerHTML=html;
+}
+window.saveApiSettings = async(sport)=>{
+ let key = document.getElementById(`api_${sport}`).value.trim();
+ let isOn = document.getElementById(`on_${sport}`).checked;
+ let live = parseInt(document.getElementById(`live_${sport}`).value)||30;
+ let normal = parseInt(document.getElementById(`normal_${sport}`).value)||300;
+ const snap = await getDoc(doc(db,"settings","main"));
+ let all = snap.exists()? (snap.data().apiSettings || {}) : {};
+ all[sport] = {apiKey:key, enabled:isOn, live, normal};
+ await setDoc(doc(db,"settings","main"), {apiSettings: all}, {merge:true});
+ showToast(`${sport} API Saved!`);
+}
+checkAdminSession(); renderAllUsers(); loadDashboard(); loadSettings(); 
 </script>
 </body>
 </html>

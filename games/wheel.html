@@ -36,7 +36,7 @@ body{background:#1a1030;display:flex;justify-content:center}
 <body>
 <div class="main">
 <div class="topBar">
-<div class="backBtn" onclick="location.href='../index.html'"><</div>
+<div class="backBtn" onclick="goBack()"><</div>
 <div class="logoBox"><h1>Play55</h1><p>👑 ROYAL WHEEL 👑</p></div>
 <div class="coinTop">🪙 <span id="balTop">0</span></div>
 </div>
@@ -130,6 +130,8 @@ function getIndex(){
     let z=[1,3,5,7]; return z[Math.floor(Math.random()*z.length)];
   }
 }
+function goBack(){ localStorage.setItem("play55_from_game","1"); location.href='../index.html'; }
+async function spin(){
 async function spin(){
  if(spinning||!bet) return; if(window.getBal()<bet){alert("Balance low - Admin se Add karwao"); return}
  spinning=true;

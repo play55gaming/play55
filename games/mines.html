@@ -107,7 +107,7 @@ initBal();
 </script>
 
 <script>
-function goBack(){ window.location.href='../index.html'; }
+function goBack(){ localStorage.setItem("play55_from_game","1"); window.location.href='../index.html'; }
 function maskName(){const p=["go","ra","sk","vi","an","ro","pr","mu"]; const n=p[Math.floor(Math.random()*p.length)]; return `${n}***${Math.floor(Math.random()*90)+10}`;}
 function getMultipliers(c){ if(c==3) return [1.14,1.33,1.58,1.92,2.5]; if(c==5) return [1.35,1.75,2.30,3.10,4.2]; return [2.10,4.50,9.00,18.0,40.0]; }
 let mines=[], revealed=0, gameActive=false, bet=0;

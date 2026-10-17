@@ -86,6 +86,43 @@ body::before{content:''; position:fixed; inset:0; background-image: radial-gradi
 .badge.pending{background:#451a03;color:#facc15;border:1px solid #eab308}
 .badge.rejected{background:#450a0a;color:#ef4444;border:1px solid #dc2626}
 </style>
+<style>
+/* SWIPE FIX - No horizontal swipe */
+html, body {
+  overscroll-behavior-x: none!important;
+  touch-action: pan-y!important;
+  overflow-x: hidden!important;
+  max-width: 100vw!important;
+  position: relative;
+}
+#mainPage, #homeContent,.ticker,.tabs,.sports,.filters,.match-list {
+  touch-action: pan-y!important;
+  overscroll-behavior-x: contain!important;
+}
+#statementPage{max-height:calc(100vh - 52px);overflow-y:auto}
+#statementList,#dwList{max-height:58vh;overflow:auto;-webkit-overflow-scrolling:touch}
+#statementList .tbl,#dwList .tbl{min-width:600px}
+</style>
+<script>
+// Block left-right swipe to go back / move page
+let _sx = 0, _sy = 0;
+document.addEventListener('touchstart', e => {
+  _sx = e.touches[0].clientX;
+  _sy = e.touches[0].clientY;
+}, {passive:true});
+
+document.addEventListener('touchmove', e => {
+  let dx = Math.abs(e.touches[0].clientX - _sx);
+  let dy = Math.abs(e.touches[0].clientY - _sy);
+  // agar horizontal move vertical se zyada hai to rok do
+  if(dx > 12 && dx > dy){
+    // ticker, tabs, sports me horizontal scroll allow karo, baki jagah block
+    let t = e.target;
+    let allow = t.closest('.ticker') || t.closest('.tabs') || t.closest('.sports')|| t.closest('#statementList') || t.closest('#dwList') || t.closest('#statementPage')
+    if(!allow) e.preventDefault();
+  }
+}, {passive:false});
+</script>
 </head>
 <body>
 <div id="loader"><div class="ldr"></div><div style="margin-top:12px">Loading Play55...</div></div>
@@ -122,12 +159,17 @@ body::before{content:''; position:fixed; inset:0; background-image: radial-gradi
 </section>
 <section id="mainPage">
   <div class="top"><div class="logo">☰ <span>Play55</span></div>
-    <div class="userArea">
-      <div class="balance">🪙 <span id="balanceValue">0</span></div>
-      <div class="usernameBox" onclick="toggleUserMenu()"><span id="topUsername">DEMO123</span> <span id="menuArrow">▼</span></div>
-      <div class="bonusBtn" onclick="toggleUserMenu()">🎁 Bonus</div>
-    </div>
+<div class="userArea" style="gap:8px">
+  <div style="display:flex;flex-direction:column;align-items:flex-end;line-height:1.1">
+    <div class="balance" style="padding:3px 10px">🪙 <span id="balanceValue">0</span></div>
+    <div style="font-size:9px;font-weight:900;color:#ffcc00;margin-top:2px">Expo: <span id="topExposure">0.00</span></div>
   </div>
+  <div class="usernameBox" onclick="toggleUserMenu()"><span id="topUsername">DEMO123</span> <span id="menuArrow">▼</span></div>
+  <div class="bonusBtn" onclick="toggleUserMenu()">🎁 Bonus</div>
+</div>
+
+
+</div>
   <div id="userMenuOverlay" onclick="toggleUserMenu()"></div>
   <div id="userMenu">
     <div style="background:#b4002a;color:#fff;text-align:center;padding:14px;font-weight:900">HI, <span id="menuUsername">DEMO123</span></div>
@@ -155,8 +197,7 @@ body::before{content:''; position:fixed; inset:0; background-image: radial-gradi
       <div class="royal-action deposite" onclick="openDeposit()">💚 DEPOSITE</div>
       <div class="royal-action withdraw" onclick="openWithdraw()">❤️ WITHDRAWAL</div>
     </div>
-    <div class="ticker" id="ticker"></div>
-    <div class="tabs" id="mainTabs">
+     <div class="tabs" id="mainTabs">
       <span data-filter="INPLAY" class="active" onclick="filterTabs('INPLAY',this)">INPLAY</span>
       <span data-filter="SPORTS" onclick="filterTabs('SPORTS',this)">SPORTS</span>
       <span data-filter="CASINO" onclick="filterTabs('CASINO',this)">CASINO</span>
@@ -164,20 +205,23 @@ body::before{content:''; position:fixed; inset:0; background-image: radial-gradi
       <span data-filter="OTHERS" onclick="filterTabs('OTHERS',this)">OTHERS</span>
       <span data-filter="MULTI" onclick="filterTabs('MULTI',this)">MULTI MARKET</span>
     </div>
-    <div class="sports" id="sportsFilter">
-      <div class="sport active" data-sport="ALL" onclick="filterSports('ALL',this)"><div class="sportIcon">🏏</div>ALL</div>
-      <div class="sport" data-sport="CRICKET" onclick="filterSports('CRICKET',this)"><div class="sportIcon">🏏</div>CRICKET</div>
-      <div class="sport" data-sport="FOOTBALL" onclick="filterSports('FOOTBALL',this)"><div class="sportIcon">⚽</div>FOOTBALL</div>
-      <div class="sport" data-sport="TENNIS" onclick="filterSports('TENNIS',this)"><div class="sportIcon">🎾</div>TENNIS</div>
-    </div>
-    <div class="filters">
-      <span class="pill active" data-pill="ALL" onclick="filterPill('ALL',this)">- ALL</span>
-      <span class="pill" data-pill="LIVE" onclick="filterPill('LIVE',this)">- LIVE</span>
-      <span class="pill" data-pill="VIRTUAL" onclick="filterPill('VIRTUAL',this)">- VIRTUAL</span>
-      <span class="pill" data-pill="PREMIUM" onclick="filterPill('PREMIUM',this)">- PREMIUM</span>
-      <div class="view">View by: <select><option>TIME</option></select></div>
-    </div>
-    <div class="match-list" id="matchList"></div>
+
+<div id="cricTBanner" onclick="location.href='cric-t.html'" style="margin:12px;background:linear-gradient(135deg,#0f172a,#1e3a8a);border:2px solid #ffcc00;border-radius:16px;padding:18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;">
+  <div style="display:flex;gap:12px;align-items:center"><div style="font-size:32px">🏏</div><div><div style="color:white;font-weight:900;font-size:18px">Cric-T Live Hub</div><div id="cricTLiveCount" style="color:#38bdf8;font-size:13px">Tap to view LIVE matches</div></div></div>
+  <div style="display:flex;gap:8px;font-size:12px;font-weight:900;color:white"><span id="countCricket">🏏 0</span><span id="countFootball">⚽ 0</span><span id="countTennis">🎾 0</span></div>
+</div>
+    <style>
+   .match-card-dark{ background: linear-gradient(180deg,#1a2a36 0%, #0f1f28 100%); border:1px solid #ff8c00; border-radius:14px; padding:12px; margin:8px; color:#fff; cursor:pointer; position:relative; }
+   .match-card-dark.top-league{ font-size:10px; color:#ffb347; font-weight:900; text-align:center; margin-bottom:8px; letter-spacing:1px; }
+   .match-card-dark.team-row{ display:flex; justify-content:space-between; align-items:center; }
+   .team{ display:flex; align-items:center; gap:8px; font-weight:900; font-size:14px; }
+   .team img{ width:32px; height:32px; border-radius:50%; border:1px solid #333; object-fit:cover; background:#fff; }
+   .center-live{ display:flex; flex-direction:column; align-items:center; gap:2px; }
+   .center-live.live-badge{ background:#e70000; color:#fff; font-size:10px; padding:2px 8px; border-radius:12px; font-weight:900; display:flex; align-items:center; gap:4px; }
+   .center-live.timer{ font-size:18px; font-weight:900; color:#ffcc00; letter-spacing:1px; }
+    </style>
+
+      <div class="match-list" id="matchList"></div>
     <div class="gameSectionTitle">GAMES - Single Click to Play</div>
     <div class="games">
       <div class="game" style="border:2px solid #00ff88" onclick="openGame('avia')">
@@ -245,14 +289,12 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // --- VISIT LOGGER ---
-try {
-  await setDoc(doc(db, "site_visits", Date.now().toString()), {
-    time: new Date().toISOString(),
-    page: location.pathname,
-    ua: navigator.userAgent.slice(0, 100)
-  });
-} catch(e) {}
-
+// --- VISIT LOGGER - FIXED NON-BLOCKING ---
+setDoc(doc(db, "site_visits", Date.now().toString()), {
+  time: new Date().toISOString(),
+  page: location.pathname,
+  ua: navigator.userAgent.slice(0, 100)
+}).catch(()=>{});
 // ... tera baki ka code
 const SETTINGS_REF = doc(db, "settings", "main");
 const DEFAULT_PASSWORD="Asdf@12";
@@ -260,10 +302,39 @@ let currentFilter={tab:'INPLAY',sport:'ALL',pill:'ALL'};
 let currentUser=null;
 let cachedSettings={waDemo:"",waMain:"",waDeposite:"",waWithdrawal:""};
 let cachedMatches=[];
-const defaultMatches=[
- {title:"Man City vs Arsenal",date:"22/09/2026 11:00",sport:"CRICKET",type:"LIVE",cat:"SPORTS",odds:["2.10","3.20","2.80","-","-","-"]},
- {title:"Aviator Crash",date:"22/09/2026 12:00",sport:"CASINO",type:"PREMIUM",cat:"PREMIUM",odds:["1.95","-","-","-","-","-"]},
-];
+const defaultMatches = []; // No hardcoded - sirf admin se ayega
+
+// HAR COUNTRY ka flag auto - koi bhi naam dalo
+window.getFlagUrl = (countryName, manualUrl)=>{
+  if(manualUrl && manualUrl.trim()!="") return manualUrl.trim(); // manual hua to wahi
+  if(!countryName) return "https://flagcdn.com/w80/un.png";
+
+  const COUNTRY_CODES = {
+    "afghanistan":"af","albania":"al","algeria":"dz","andorra":"ad","angola":"ao","argentina":"ar","armenia":"am","australia":"au","austria":"at","azerbaijan":"az",
+    "bahrain":"bh","bangladesh":"bd","belarus":"by","belgium":"be","bhutan":"bt","bolivia":"bo","bosnia":"ba","botswana":"bw","brazil":"br","brunei":"bn",
+    "bulgaria":"bg","cambodia":"kh","canada":"ca","chile":"cl","china":"cn","colombia":"co","croatia":"hr","cuba":"cu","cyprus":"cy","czech":"cz",
+    "denmark":"dk","egypt":"eg","england":"gb-eng","ethiopia":"et","finland":"fi","france":"fr","germany":"de","ghana":"gh","greece":"gr","hongkong":"hk",
+    "hungary":"hu","iceland":"is","india":"in","indonesia":"id","iran":"ir","iraq":"iq","ireland":"ie","israel":"il","italy":"it","japan":"jp",
+    "jordan":"jo","kazakhstan":"kz","kenya":"ke","kuwait":"kw","kyrgyzstan":"kg","laos":"la","latvia":"lv","lebanon":"lb","malaysia":"my","maldives":"mv",
+    "mali":"ml","malta":"mt","mexico":"mx","mongolia":"mn","morocco":"ma","myanmar":"mm","nepal":"np","netherlands":"nl","newzealand":"nz","nigeria":"ng",
+    "norway":"no","oman":"om","pakistan":"pk","palestine":"ps","philippines":"ph","poland":"pl","portugal":"pt","qatar":"qa","romania":"ro","russia":"ru",
+    "saudiarabia":"sa","scotland":"gb-sct","serbia":"rs","singapore":"sg","slovakia":"sk","slovenia":"si","somalia":"so","southafrica":"za","spain":"es","srilanka":"lk",
+    "sweden":"se","switzerland":"ch","syria":"sy","taiwan":"tw","tajikistan":"tj","thailand":"th","turkey":"tr","uganda":"ug","ukraine":"ua","uae":"ae","unitedarabemirates":"ae","uk":"gb","usa":"us","unitedstates":"us","uzbekistan":"uz","vietnam":"vn","wales":"gb-wls","westindies":"ag","yemen":"ye","zimbabwe":"zw","zambia":"zm"
+  };
+
+  let name = countryName.toLowerCase().trim().replace(/[^a-z]/g,'');
+  let code = COUNTRY_CODES[name];
+
+  // Agar naam me space hai jaise "South Africa" to 2nd try
+  if(!code){
+    let clean = countryName.toLowerCase().trim();
+    code = COUNTRY_CODES[clean.replace(/\s+/g,'')];
+  }
+
+  if(!code) return `https://flagcdn.com/w80/un.png`; // unknown ke liye UN flag
+  return `https://flagcdn.com/w80/${code}.png`;
+}
+
 window.showLoader=(v)=>document.getElementById('loader').style.display=v?'flex':'none';
 window.getSettings=()=> cachedSettings;
 async function loadSettingsFirebase(){
@@ -319,11 +390,6 @@ window.updateBalance=async(delta, desc)=>{
       day: now.toLocaleDateString("en-IN")
     })
   });
-  currentUser.coins=(currentUser.coins||0)+delta;
-  if(delta<0) currentUser.exposure=(currentUser.exposure||0)+amt;
-  document.getElementById("balanceValue").innerText=Math.floor(currentUser.coins);
-  localStorage.setItem("play55_balance",Math.floor(currentUser.coins));
-  refreshMenuData();
 }
 function getDisplayName(u){ if(!u) return "DEMO123"; return u.username.toUpperCase(); }
 window.toggleUserMenu=()=>{
@@ -332,6 +398,17 @@ window.toggleUserMenu=()=>{
   m.style.display=isOpen?"none":"block"; o.style.display=isOpen?"none":"block";
   document.getElementById("menuArrow").innerText=isOpen?"▼":"▲";
   if(!isOpen) refreshMenuData();
+}
+window.updateTopExposure = ()=>{
+  let exp = 0;
+  try{
+    let myBets = JSON.parse(localStorage.getItem('cricMyBets')||'[]');
+    for(let b of myBets){ if(b.status=='pending') exp += b.bet; }
+  }catch(e){}
+  let el = document.getElementById('topExposure');
+  if(el) el.innerText = Math.floor(exp)+'.00';
+  let el2 = document.getElementById('mExposure');
+  if(el2) el2.innerText = Math.floor(exp)+'.00';
 }
 window.refreshMenuData=()=>{
   let u=currentUser; if(!u) return;
@@ -344,6 +421,7 @@ window.refreshMenuData=()=>{
   document.getElementById("mBonus").innerText=(u.bonus||1000)+".00";
   document.getElementById("mAvail").innerText=Math.floor(u.coins||0)+".00";
   document.getElementById("mAwait").innerText=(u.bonus||1000);
+  updateTopExposure();
 }
 window.goHome=()=>{ document.getElementById("userMenu").style.display="none"; document.getElementById("userMenuOverlay").style.display="none"; document.getElementById("profilePage").style.display="none"; document.getElementById("statementPage").style.display="none"; document.getElementById("homeContent").style.display="block"; renderMatches(); }
 window.openMyProfile=()=>{
@@ -358,7 +436,7 @@ window.openStatement=()=>{
   let u=currentUser;
   document.getElementById("userMenu").style.display="none"; document.getElementById("userMenuOverlay").style.display="none";
   document.getElementById("homeContent").style.display="none"; document.getElementById("profilePage").style.display="none"; document.getElementById("statementPage").style.display="block";
-  let hist=u.history||[]; if(hist.length===0){ document.getElementById("statementList").innerHTML="<div class='emptyBox'>No transactions yet</div>"; return; }
+  let hist=(u.history||[]).filter(h=>{let s=(h.desc||'').toLowerCase(); return !(s.includes('admin')||s.includes('coin add')||s.includes('coin cut'));}); if(hist.length===0){ document.getElementById("statementList").innerHTML="<div class='emptyBox'>No transactions yet</div>"; return; }
   let html=`<table class="tbl"><tr><th>Date</th><th>Amount</th><th>Balance</th><th>Type</th><th>Ref</th><th>Reason</th></tr>`;
   hist.slice().reverse().forEach(h=>{ html+=`<tr><td>${h.date||h.time} ${h.day||''}</td><td>${h.amount}</td><td>${h.balance}</td><td>${h.type}</td><td>${h.ref||''}</td><td>${h.desc||h.reason||''}</td></tr>`; }); html+=`</table>`;
   document.getElementById("statementList").innerHTML=html;
@@ -399,18 +477,49 @@ window.openChangePass=()=> openMyProfile();
 window.filterTabs=(val,el)=>{ currentFilter.tab=val; document.querySelectorAll('#mainTabs span').forEach(s=>s.classList.remove('active')); el.classList.add('active'); renderMatches(); }
 window.filterSports=(val,el)=>{ currentFilter.sport=val; document.querySelectorAll('#sportsFilter.sport').forEach(s=>s.classList.remove('active')); el.classList.add('active'); renderMatches(); }
 window.filterPill=(val,el)=>{ currentFilter.pill=val; document.querySelectorAll('.pill').forEach(s=>s.classList.remove('active')); el.classList.add('active'); renderMatches(); }
+
+window.getFlagUrl = (countryName, manualUrl)=>{
+  if(manualUrl && manualUrl.trim()!="") return manualUrl.trim();
+  let map = {india:'in', japan:'jp', oman:'om', pakistan:'pk', srilanka:'lk', nepal:'np', afghanistan:'af', bangladesh:'bd', australia:'au', england:'gb-eng'};
+  let key = countryName.toLowerCase();
+  let code = map[key] || 'un';
+  return `https://flagcdn.com/w80/${code}.png`;
+}
+
 window.renderMatches=()=>{
-  const ticker=document.getElementById("ticker"); const matchList=document.getElementById("matchList"); if(!ticker||!matchList) return;
+  const ticker=document.getElementById("ticker");
+  const matchList=document.getElementById("matchList");
+  if(!ticker||!matchList) return;
   let matches=getMatches();
   let filtered=matches.filter(m=>{
+    if(currentFilter.pill!=='ALL' && m.status!==currentFilter.pill && m.type!==currentFilter.pill) return false;
     if(currentFilter.sport!=='ALL' && m.sport!==currentFilter.sport) return false;
-    if(currentFilter.pill!=='ALL' && m.type!==currentFilter.pill) return false;
-    if(currentFilter.tab==='INPLAY'){ if(m.type!=='LIVE' && m.status!=='LIVE') return false; }
     return true;
   });
-  ticker.innerHTML=filtered.map(m=>`<div class="match-card">🏏 ${m.title}<br><span style="background:#07943d;padding:3px 7px;border-radius:4px;margin-top:6px;display:inline-block;font-size:11px;color:#fff;">${m.date}</span></div>`).join("") || "<div class='match-card'>No matches</div>";
+  ticker.innerHTML=filtered.map(m=>`<div class="match-card">🏏 ${m.teamA||m.title} vs ${m.teamB||''}<br><span style="background:#07943d;padding:3px 7px;border-radius:4px;margin-top:6px;display:inline-block;font-size:11px;color:#fff;">${m.time||m.date}</span></div>`).join("") || "<div class='match-card'>No matches</div>";
   if(filtered.length===0){ matchList.innerHTML=`<div class="emptyBox"><b>No matches found</b></div>`; return; }
-  matchList.innerHTML=filtered.map(m=>`<div class="match-item" onclick="placeBet('${m.title.replace(/'/g,"")}')"><div style="font-weight:800;display:flex;justify-content:space-between"><span>${m.title}</span><span style="color:#b45309">${m.cat||''}</span></div><div style="color:#ef4444;font-size:11px;margin-top:4px">${m.date}</div><div class="odds"><div class="blue">${m.odds[0]}</div><div class="pink">${m.odds[1]}</div><div class="blue">${m.odds[2]}</div><div class="pink">${m.odds[3]}</div><div class="blue">${m.odds[4]}</div><div class="pink">${m.odds[5]}</div></div></div>`).join("");
+  matchList.innerHTML=filtered.map((m,i)=>`
+    <div style="background: linear-gradient(180deg,#1a2a36 0%, #0f1f28 100%); border:1px solid #ff8c00; border-radius:14px; padding:12px; margin:8px; color:#fff; cursor:pointer;" onclick="openCricMatch(${i})">
+      <div style="font-size:10px; color:#ffb347; font-weight:900; text-align:center; margin-bottom:8px;">CRICKET | ${m.league||'ICC CWC LEAGUE 2'}</div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div style="display:flex; align-items:center; gap:8px; font-weight:900; font-size:14px;"><img src="${getFlagUrl(m.team1||m.teamA||'India', m.logo1||m.flagA||m.flag1)}" style="width:32px;height:32px;border-radius:50%;background:#fff;"> <span>${m.team1||m.teamA||'India'}</span></div>
+        <div style="display:flex; flex-direction:column; align-items:center;"><span style="background:#e70000;color:#fff;font-size:10px;padding:2px 8px;border-radius:12px;">● ${m.status||'LIVE'}</span><span style="font-size:18px;font-weight:900;color:#ffcc00;">${m.timer||'LIVE'}</span></div>
+        <div style="display:flex; align-items:center; gap:8px; font-weight:900; font-size:14px;"><span>${m.team2||m.teamB||'Japan'}</span><img src="${getFlagUrl(m.team2||m.teamB||'Japan', m.logo2||m.flagB||m.flag2)}" style="width:32px;height:32px;border-radius:50%;background:#fff;"></div>
+    </div>
+  `).join("");
+}
+window.openCricMatch = (idx)=>{
+  let matches = getMatches();
+  let filtered = matches.filter(m=>{
+    if(currentFilter.pill!=='ALL' && m.status!==currentFilter.pill) return false;
+    if(currentFilter.sport!=='ALL' && m.sport!==currentFilter.sport) return false;
+    return true;
+  });
+  let m = filtered[idx] || matches[idx];
+  if(!m){ showToast("Match nahi mila"); return; }
+  localStorage.setItem('selectedMatch', JSON.stringify(m));
+  localStorage.setItem('cricTeamMatches', JSON.stringify(matches));
+  location.href='/cric-t.html';
 }
 window.placeBet=async(title)=>{ if(confirm(title+" pe 100 coins lagau?")){ if(!currentUser || currentUser.coins<100){showToast("Balance kam hai");return;} await updateBalance(-100,'Bet on '+title); showToast("Bet placed on "+title); } }
 window.openGame=(type)=>{
@@ -438,12 +547,13 @@ window.showMainPage=async(user)=>{
   await loadMatchesFirebase();
   refreshMenuData(); renderMatches();
   onSnapshot(doc(db,"clients",user.username),(snap)=>{
-    if(snap.exists()){
+    if(!snap.exists()) return;
+const serverCoins = snap.data().coins||0;
+if(serverCoins===0 && (currentUser?.coins||0)>10 && !window._allowZeroReset){ console.warn("Blocked 0 reset"); return; }
       currentUser={id:snap.id,...snap.data()};
       document.getElementById("balanceValue").innerText=Math.floor(currentUser.coins||0);
       localStorage.setItem("play55_balance",Math.floor(currentUser.coins||0));
       refreshMenuData();
-    }
   });
   onSnapshot(SETTINGS_REF,(snap)=>{
     if(snap.exists()){
@@ -525,14 +635,23 @@ window.loadQRforUser=async()=>{
     if(snap.exists()){
      const d=snap.data();
      const qr = d.qr2 || d.qrUrl || "";
-     document.getElementById('userQRBox').innerHTML = qr? `<img src="${qr}" style="width:200px;border-radius:12px;border:2px solid gold"><p style="font-size:11px;margin-top:6px;color:#000">${d.upiId||bank.upi||''}<br>${d.bank||''}</p>` : 'QR not set by Admin';
+     document.getElementById('userQRBox').innerHTML = qr? `<img src="${qr}" style="width:200px;border-radius:12px;border:2px solid gold"><p style="font-size:11px;margin-top:6px;color:#000">${d.upiId||''}<br>${d.bankName||''} </p>` : 'QR not set by Admin';
 document.getElementById('userBankBox').innerHTML = `<b>Bank:</b> ${d.bankName||'N/A'}<br><b>Holder:</b> ${d.holderName||'N/A'}<br><b>A/C No:</b> ${d.accNumber||'N/A'}<br><b>IFSC:</b> ${d.ifscCode||'N/A'}<br><b>UPI:</b> ${d.upiId||'N/A'}`;
-    }
+      }
   }catch(e){}
 }
 
-window.showToast = (m)=> alert(m);
+window.showToast = (m)=>{
+  let t=document.getElementById('toast');
+  if(!t) return alert(m);
+  t.innerText=m;
+  t.style.display='block';
+  clearTimeout(window._tt);
+  window._tt=setTimeout(()=>{t.style.display='none'},2500);
+};
+let depositMethod = 'qr';
 window.depositMethod = 'qr';
+
 window.switchDepositTab = (type)=>{
   depositMethod = type;
   document.getElementById('qrView').style.display = type==='qr'? 'block' : 'none';
@@ -553,7 +672,20 @@ window.submitDeposit=async()=>{
   btn.disabled=true; btn.innerText="Uploading...";
   try{
    // Fix: compress karne ke liye
-const toCompress = (f)=> new Promise(r=>{ const i=new Image(); i.onload=()=>{ const c=document.createElement('canvas'); c.width=500; c.height=i.height*(500/i.width); c.getContext('2d').drawImage(i,0,0,c.width,c.height); r(c.toDataURL('image/jpeg',0.35)); }; const rd=new FileReader(); rd.onload=()=>i.src=rd.result; rd.readAsDataURL(f); });
+const toCompress = (f)=> new Promise(r=>{
+  const rd=new FileReader();
+  rd.onload=()=>{
+    const i=new Image();
+    i.onload=()=>{
+      const c=document.createElement('canvas');
+      c.width=500; c.height=i.height*(500/i.width);
+      c.getContext('2d').drawImage(i,0,0,c.width,c.height);
+      r(c.toDataURL('image/jpeg',0.35));
+    };
+    i.src=rd.result;
+  };
+  rd.readAsDataURL(f);
+});
 const slipBase64 = await toCompress(slipFile);
     await addDoc(collection(db,'deposits'),{ username: currentUser.username, amount: parseInt(amt), utr: utr, method: depositMethod, slipUrl: slipBase64, status: 'pending', time: new Date().toLocaleString(), createdAt: serverTimestamp() });
     showToast('✅ Deposit Request Sent! Pending me hai');
@@ -625,10 +757,11 @@ window.changePassword=async()=>{
       if(user.isSuspended){showToast("⛔ Suspended"); localStorage.removeItem("play55_current_user"); showLogin();}
       else await showMainPage(user);
     }else showLogin();
-  }catch{showLogin();}
+}catch(e){ showLogin(); }
   showLoader(false);
 })();
 </script>
+<div id="toast" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:12px 20px;border-radius:25px;font-size:13px;font-weight:800;z-index:99999;display:none;box-shadow:0 4px 15px rgba(0,0,0,.4);border:1px solid #ffcc00;max-width:90%;text-align:center"></div>
 
 <!-- DEPOSIT MODAL -->
 <div id="depositModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99;align-items:center;justify-content:center;padding:15px">
@@ -680,7 +813,5 @@ window.changePassword=async()=>{
   <button id="wBtn" class="loginBtn" style="background:#ef4444;color:#fff; width:100%" onclick="submitWithdraw()">Process To Withdrawal</button>
  </div>
 </div>
-
-</script>
 </body>
 </html>
