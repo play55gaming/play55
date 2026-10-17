@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cric-T Live</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}body{background:#0e1726;color:#fff;padding-bottom:70px}
+.top{position:sticky;top:0;z-index:20;background:#111a2c;padding:12px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid gold}
+.logo{color:gold;border:1px solid gold;padding:4px 10px;font-weight:900}
+.wallet{background:gold;color:#000;padding:6px 12px;border-radius:20px;font-weight:900;font-size:12px}
+.scoreBox{background:#000;height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-bottom:2px solid #ff6a00;position:relative}
+.tabs{display:flex;gap:8px;padding:10px;overflow-x:auto}.tab{background:#1a2336;border:1px solid #444;color:#fff;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}.tab.active{background:#3a2210;border-color:#ff6a00;color:#ff9a3c}
+.card{margin:10px 12px;background:#162032;border:1px solid #ff6a00;border-radius:18px;overflow:hidden;cursor:pointer}
+.head{padding:8px;text-align:center;font-size:12px;font-weight:800;color:#e2e8f0}
+.body{display:flex;justify-content:space-between;align-items:center;padding:12px 14px}
+.team{display:flex;align-items:center;gap:8px;font-weight:700;max-width:32%;overflow:hidden}
+.team img{width:38px;height:38px;border-radius:50%;background:#fff;object-fit:cover;flex-shrink:0}
+.team-name{white-space:nowrap;overflow:hidden;display:inline-block;max-width:90px}
+.team-name.marquee{animation:marquee 6s linear infinite}
+@keyframes marquee{0%{transform:translateX(20%)}100%{transform:translateX(-100%)}}
+.mid{text-align:center;min-width:100px}
+.live{color:#ff2d55;font-weight:900;font-size:11px;animation:blink 1s infinite}
+.badge-live{background:#ff2d55;color:#fff;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:900;animation:blink 1s infinite;display:inline-block}
+.badge-upcoming{background:#0b1220;border:1px solid #38bdf8;color:#38bdf8;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:900;display:inline-block}
+.badge-ended{background:#ff0000;color:#fff;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:900;display:inline-block}
+.badge-rain{background:yellow;color:#000;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:900;display:inline-block}
+.timer{background:#0b1220;border:1px solid #223;padding:4px 10px;border-radius:12px;font-size:12px;margin-top:4px;display:inline-block;min-width:70px}
+.countdown{font-size:11px;color:#aaa;margin-top:3px}
+@keyframes blink{0%{opacity:1}50%{opacity:.4}100%{opacity:1}}
+#detailView{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#0e1726;z-index:50;overflow-y:auto}
+.tvScreen{background:linear-gradient(#000,#111);height:220px;border-bottom:3px solid gold;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.tvScreen.vs{font-size:32px;font-weight:900;color:gold}
+.tvControls{position:absolute;top:10px;right:10px;display:flex;gap:8px}
+.iconBtn{background:rgba(255,255,255,0.15);border:1px solid #555;color:#fff;padding:6px 10px;border-radius:20px;font-size:12px;cursor:pointer}
+.bet{background:#f8fafc;color:#111;margin:6px 12px;border-radius:12px;padding:12px;display:flex;justify-content:space-between;align-items:center}
+.rate{background:gold;padding:6px 14px;border-radius:20px;font-weight:900;font-size:13px;cursor:pointer}
+.betHistory{background:#162032;margin:10px 12px;padding:10px;border-radius:12px;border:1px solid #333;font-size:12px}
+</style></head><body>
+
+<div id="listView">
+<div class="top"><div class="logo">Cric-T</div><div style="display:flex;gap:8px;align-items:center"><div id="liveCount" style="font-size:12px">Loading...</div></div></div>
+<div class="scoreBox" id="scoreBox"><div id="scoreText" style="text-align:center"><b style="color:gold">Auto Score Board</b><br><small style="color:#888">Loading matches...</small></div></div>
+<div class="tabs"><div class="tab active" data-f="all">All</div><div class="tab" data-f="live">Live</div><div class="tab" data-f="upcoming">Upcoming</div><div class="tab" data-f="ended">Ended</div></div>
+<div id="apiStatus" style="font-size:11px;color:#6b7280;text-align:center;padding:6px;background:#1f2937;margin:10px 12px;border-radius:6px">API Ready • 5 min • 0/100</div>
+<div id="list"></div>
+</div>
+
+<div id="detailView">
+  <div class="top"><div style="display:flex;gap:10px;align-items:center"><span onclick="closeDetail()" style="cursor:pointer;font-size:20px">←</span><div class="logo">Cric-T TV</div></div><div class="wallet" id="walletDetail">0</div></div>
+  <div class="tvScreen" id="tvScreen">
+    <div class="tvControls">
+      <button class="iconBtn" id="soundBtn" onclick="toggleCrowd()">🔊 Crowd ON</button>
+      <button class="iconBtn" onclick="closeDetail()">✕ Close</button>
+    </div>
+    <div id="tvLogos" style="display:flex;gap:25px;align-items:center"></div>
+    <div id="tvTeams" style="margin-top:10px;font-weight:900"></div>
+    <div id="tvStatus" style="margin-top:6px;color:#38bdf8;font-size:13px"></div>
+    <div style="margin-top:8px"><span id="tvScore" style="color:gold;font-size:18px;font-weight:900">--</span></div>
+    <audio id="crowdAudio" loop><source src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a73467.mp3?filename=crowd-cheering-110025.mp3" type="audio/mpeg"></audio>
+  </div>
+  <div id="detailBets"></div>
+  <div class="betHistory" id="betHistory"></div>
+</div>
+<script type="module">
+import { db } from "./firebase.js";
+import { doc, getDoc, updateDoc, increment, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+let allMatches=[], filter='all', currentMatchIndex=-1;
+
+// ---- POINT 7 - ENDED AUTO DELETE 12H ----
+function isOldEnded(m){
+  if((m.status||'').toLowerCase() !== 'ended' && (m.type||'').toUpperCase() !== 'ENDED') return false;
+  const end = m.endedAt || m.timeStamp || 0;
+  if(!end) return false;
+  return (Date.now() - end) > 12*60*60*1000;
+}
+function getActiveMatches(){
+  return allMatches.filter(m => !isOldEnded(m));
+}
+// -----------------------------------------
+
+let myBets = JSON.parse(localStorage.getItem('cricMyBets')||'[]');
+let crowdOn = false;
+let wallet = 0;
+const username = (localStorage.getItem("play55_current_user")||"demo").trim().toLowerCase();
+async function initCricWallet(){
+  const ref = doc(db,"clients",username);
+  const snap = await getDoc(ref);
+  if(snap.exists()){ wallet = snap.data().coins || 0; }
+onSnapshot(ref, s=>{
+    if(!s.exists()) return;
+    wallet = s.data().coins || 0;
+    const wd = document.getElementById('walletDetail');
+    if(wd) wd.innerText = wallet;
+    const wm = document.getElementById('walletMain');
+    if(wm) wm.innerText = wallet;
+});
+}
+initCricWallet();
+
+// updateWalletUI pura hata diya - kyuki tujhe balance dikhana hi nahi hai
+
+function getTimeObj(m){
+  if(!m.mTime) return null;
+  try{
+    if(m.mTime.seconds) return new Date(m.mTime.seconds*1000);
+    return new Date(m.mTime);
+  }catch(e){ return null; }
+}
+function formatHMS(diffMs){
+  if(diffMs<0) diffMs=0;
+  let s=Math.floor(diffMs/1000);
+  let h=Math.floor(s/3600); s%=3600;
+  let m=Math.floor(s/60); s%=60;
+  return `${String(h).padStart(1,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function getTimeDisplay(m){ let d=getTimeObj(m); return d?d.toLocaleString():'TBD'; }
+
+function render(){
+ let filtered = filter=='all'? allMatches : allMatches.filter(m=>(m.status||'upcoming')==filter);
+ document.getElementById('liveCount').innerText=`${filtered.length} Matches`;
+ if(filtered.length==0){ document.getElementById('list').innerHTML=`<p style="padding:20px;color:#888">No ${filter} matches</p>`; return; }
+ document.getElementById('list').innerHTML=filtered.map((m,idx)=>{
+   let realIdx = allMatches.indexOf(m);
+   let isLong1 = (m.team1||'').length>10;
+   let isLong2 = (m.team2||'').length>10;
+   let timeObj = getTimeObj(m);
+   let timerHtml = '';
+   if(m.status=='live' && timeObj){
+     timerHtml = `<div class="badge-live" data-live-timer="${realIdx}">((•)) LIVE</div><div class="timer" id="liveTimer-${realIdx}">${formatHMS(Date.now()-timeObj)}</div>`;
+   }else if(m.status=='upcoming' && timeObj){
+     timerHtml = `<div class="badge-upcoming">UPCOMING</div><div class="timer" id="upTimer-${realIdx}">--:--:--</div><div class="countdown" id="upCount-${realIdx}">Starting in --</div>`;
+   }else if(m.status=='ended'){
+     timerHtml = `<div class="badge-ended">ENDED</div><div class="timer">${getTimeDisplay(m)}</div>`;
+   }else if(m.status=='rain'){
+     timerHtml = `<div class="badge-rain">☔ RAIN</div><div class="timer">Stopped</div>`;
+   }else{
+     timerHtml = `<div class="badge-upcoming">${(m.status||'upcoming').toUpperCase()}</div><div class="timer">${getTimeDisplay(m)}</div>`;
+   }
+   return `
+ <div class="card" onclick="openMatch(${realIdx})">
+  <div class="head">${(m.sport||'CRICKET').toUpperCase()} | ${(m.title||m.team1+' VS '+m.team2).toUpperCase()} | <span style="color:${m.status=='live'?'#ff2d55':m.status=='rain'?'yellow':'#38bdf8'}">${(m.status||'upcoming').toUpperCase()}</span></div>
+  <div class="body">
+   <div class="team">${m.logo1?`<img src="${m.logo1}" onerror="this.style.display='none'">`:'🏏'} <span class="team-name ${isLong1?'marquee':''}">${m.team1}</span></div>
+   <div class="mid">${timerHtml}</div>
+   <div class="team"><span class="team-name ${isLong2?'marquee':''}">${m.team2}</span> ${m.logo2?`<img src="${m.logo2}" onerror="this.style.display='none'">`:'🏏'}</div>
+  </div>
+ </div>`;
+ }).join('');
+ if(allMatches.length>0){
+   let liveM = allMatches.find(m=>m.status=='live') || allMatches[0];
+   document.getElementById('scoreText').innerHTML = `<div style="display:flex;gap:15px;align-items:center"><img src="${liveM.logo1}" style="width:40px;height:40px;border-radius:50%;background:#fff" onerror="this.style.display='none'"><b style="color:gold">${liveM.team1} VS ${liveM.team2}</b><img src="${liveM.logo2}" style="width:40px;height:40px;border-radius:50%;background:#fff" onerror="this.style.display='none'"></div><small style="color:#aaa">${liveM.title||''} - ${liveM.status}</small>`;
+ }
+}
+
+function updateAllTimers(){
+  let now=Date.now();
+  allMatches.forEach((m,i)=>{
+    let d=getTimeObj(m); if(!d) return;
+    if(m.status=='live'){
+      let el=document.getElementById(`liveTimer-${i}`);
+      if(el) el.innerText=formatHMS(now-d.getTime());
+    }
+    if(m.status=='upcoming'){
+      let el=document.getElementById(`upTimer-${i}`);
+      let el2=document.getElementById(`upCount-${i}`);
+      let diff=d.getTime()-now;
+      if(el){
+        if(diff<=0){ el.innerText='00:00:00'; if(el2) el2.innerText='Match Starting Soon'; }
+        else { el.innerText=formatHMS(diff); if(el2) el2.innerText=`Starting in ${formatHMS(diff)}`; }
+      }
+    }
+  });
+}
+setInterval(updateAllTimers,1000);
+
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); filter=t.dataset.f; render(); });
+});
+
+window.openMatch=(idx)=>{
+ currentMatchIndex=idx; let m=allMatches[idx];
+ document.getElementById('listView').style.display='none'; document.getElementById('detailView').style.display='block';
+ document.getElementById('tvLogos').innerHTML=`<img src="${m.logo1}" style="width:60px;height:60px;border-radius:50%;background:#fff;object-fit:cover"><span class="vs">VS</span><img src="${m.logo2}" style="width:60px;height:60px;border-radius:50%;background:#fff;object-fit:cover">`;
+ document.getElementById('tvTeams').innerHTML=`<span class="team-name ${m.team1.length>10?'marquee':''}">${m.team1}</span> vs <span class="team-name ${m.team2.length>10?'marquee':''}">${m.team2}</span>`;
+ document.getElementById('tvStatus').innerText=`${m.title||''} | ${m.status.toUpperCase()} | ${getTimeDisplay(m)}`;
+ if(m.status=='live'){ document.getElementById('tvScore').innerHTML=`<span class="badge-live">((•)) LIVE - <span id="detailLiveTimer">${formatHMS(Date.now()-getTimeObj(m))}</span></span>`; }
+ else if(m.status=='upcoming'){ document.getElementById('tvScore').innerHTML=`<span class="badge-upcoming" id="detailUpTimer">Starting in --</span>`; }
+ else if(m.status=='rain'){ document.getElementById('tvScore').innerHTML=`<span class="badge-rain">☔ MATCH STOPPED - RAIN</span>`; }
+ else { document.getElementById('tvScore').innerHTML=`<span class="badge-ended">MATCH ${m.status.toUpperCase()}</span>`; }
+ // === 9TH POINT FINAL - 20-50 RANDOM FAKE BETS ===
+ function genRandomBets(t1, t2){
+   const tpls = [
+{title:`Match Winner`, type:'winner', team1Bet:'100', team1Win:'185', team2Bet:'100', team2Win:'190'},
+     {title:`Total Sixes Over 10.5`, type:'range', bet:'100', win:'195', rule:'Over 10.5 Sixes'},
+     {title:`Total Fours Over 15.5`, type:'range', bet:'100', win:'190', rule:'Over 15.5 Fours'},
+     {title:`Total Runs Over 150.5`, type:'range', bet:'100', win:'180', rule:'Match Runs'},
+     {title:`Powerplay 45.5 Over`, type:'range', bet:'100', win:'185', rule:'First 6 Overs'},
+     {title:`Top Batsman - ${t1}`, type:'range', bet:'100', win:'210', rule:'Most Runs'},
+     {title:`Top Batsman - ${t2}`, type:'range', bet:'100', win:'210', rule:'Most Runs'},
+     {title:`Total Wickets Over 12.5`, type:'range', bet:'100', win:'190', rule:'Total Wickets'},
+   ];
+   let count = Math.floor(Math.random()*31)+20; // 20-50
+   let out=[];
+   for(let i=0;i<count;i++){
+     let p = tpls[Math.floor(Math.random()*tpls.length)];
+     out.push({...p, bets: Math.floor(Math.random()*400)+50, isAuto:true});
+   }
+   return out;
+ }
+ let real = m.fancies || [];
+ let fake = genRandomBets(m.team1, m.team2);
+ let allBets = [...real, ...fake];
+ window.currentDetailBets = allBets; // IMPORTANT
+
+ document.getElementById('detailBets').innerHTML = allBets.map((f,fi)=>{
+  let extra = f.isAuto ? `<span style="font-size:10px;color:#38bdf8;margin-left:6px">🔥 ${f.bets||150}+ bets</span>` : '';
+  if(f.type=='winner') return `<div class="bet"><span>${f.title} - ${m.team1} ${extra}</span><span class="rate" onclick="placeBet(${fi},'team1')">${f.team1Bet} → ${f.team1Win}</span></div><div class="bet"><span>${f.title} - ${m.team2} ${extra}</span><span class="rate" onclick="placeBet(${fi},'team2')">${f.team2Bet} → ${f.team2Win}</span></div>`;
+  return `<div class="bet"><div><b>${f.title}</b> ${extra}<div class="rule">${f.rule||''}</div></div><span class="rate" onclick="placeBet(${fi},'single')">Bet ${f.bet||''} → Win ${f.win||''}</span></div>`;
+ }).join('') || '<p style="padding:20px;color:#888">No bets for this match</p>';
+ renderBetHistory();
+ if(m.status=='live' &&!crowdOn) toggleCrowd();
+ checkAutoSettlement();
+}
+
+window.closeDetail=()=>{
+ document.getElementById('detailView').style.display='none'; document.getElementById('listView').style.display='block';
+ let audio=document.getElementById('crowdAudio'); audio.pause(); crowdOn=false; document.getElementById('soundBtn').innerText='🔊 Crowd ON';
+}
+
+window.toggleCrowd=()=>{
+ let audio=document.getElementById('crowdAudio'); let btn=document.getElementById('soundBtn');
+ if(crowdOn){ audio.pause(); btn.innerText='🔇 Crowd OFF'; crowdOn=false; } else { audio.play().catch(()=>{}); btn.innerText='🔊 Crowd ON'; crowdOn=true; }
+}
+
+window.placeBet=async(fancyIdx, side)=>{
+ let m=allMatches[currentMatchIndex]; let f=(window.currentDetailBets||m.fancies)[fancyIdx];
+ let betAmt = parseInt((f.bet||f.team1Bet||'100').replace(/[^0-9]/g,'')) || 100;
+ let winAmt = parseInt((f.win||f.team1Win||f.overWin||'200').replace(/[^0-9]/g,'')) || 200;
+ if(side=='team2'){ betAmt=parseInt((f.team2Bet||'100').replace(/[^0-9]/g,''))||100; winAmt=parseInt((f.team2Win||'200').replace(/[^0-9]/g,''))||200; }
+if(wallet < betAmt){ alert("Coins kam hai!"); return; }
+await updateDoc(doc(db,"clients",username),{coins:increment(-betAmt)});
+ let betRecord = {matchId: m.createdAt||currentMatchIndex, match: m.team1+' vs '+m.team2, fancy: f.title, side, bet: betAmt, win: winAmt, status: 'pending', time: new Date().toLocaleString()};
+ myBets.unshift(betRecord); localStorage.setItem('cricMyBets', JSON.stringify(myBets));
+alert(`Bet lag gaya! ${betAmt} coins cut`);
+ renderBetHistory();
+}
+
+function renderBetHistory(){
+ let html = `<b>My Bets (Auto Settlement)</b><br><br>`;
+ if(myBets.length==0) html+='No bets yet';
+ else{ html+=myBets.map((b)=>`<div style="padding:6px;border-bottom:1px solid #333;display:flex;justify-content:space-between"><span>${b.match} - ${b.fancy} - ₹${b.bet}</span><span style="color:${b.status=='won'?'lime':b.status=='lost'?'red':'gold'}">${b.status.toUpperCase()} ${b.status=='won'?'+₹'+b.win:''}</span></div>`).join(''); }
+ document.getElementById('betHistory').innerHTML=html;
+}
+async function checkAutoSettlement(){
+ let m=allMatches[currentMatchIndex]; if(!m) return;
+ if(m.status!=='ended' && m.status!=='ENDED' && m.status!=='rain' && m.status!=='abandoned') return;
+
+ let now = Date.now();
+ let endedTime = m.endedAt || now;
+ let settleTime = endedTime + 30*60*1000;
+
+ let winner = (m.winner||'').toLowerCase() || 'all';
+ let isRain = (m.status=='rain' || m.status=='abandoned');
+
+ // Step 1: Loss ko turant khatam karo
+ for(let b of myBets){
+   if(b.matchId==(m.createdAt||currentMatchIndex) && b.status=='pending'){
+     let isWin = (winner=='all' || b.side.toLowerCase()==winner);
+     if(!isWin &&!isRain){
+       b.status='lost';
+     }
+   }
+ }
+ localStorage.setItem('cricMyBets', JSON.stringify(myBets));
+ renderBetHistory();
+
+ // Step 2: Win ko 30 min rok ke rakho
+ if(now < settleTime){
+   return; // win abhi exposure me hi rahega
+ }
+
+ // Step 3: 30 min baad win credit
+ for(let b of myBets){
+   if(b.matchId==(m.createdAt||currentMatchIndex) && b.status=='pending'){
+     b.status='won';
+     let creditAmt = isRain? b.bet : b.win;
+     await updateDoc(doc(db,"clients",username),{
+       coins:increment(creditAmt),
+       history:arrayUnion({date:new Date().toLocaleString(), amount:creditAmt, type:'CREDIT', desc:`Win: ${b.match}`, ref:'WIN'+Date.now().toString().slice(-5), balance: wallet + creditAmt})
+     });
+   }
+ }
+ localStorage.setItem('cricMyBets', JSON.stringify(myBets));
+ renderBetHistory();
+}
+let localMatches = JSON.parse(localStorage.getItem('cricTeamMatches')||'[]');
+let firestoreMatches = [];
+// === REQ LIMITER - 100 REQ ME 2 RESERVE ===
+const DAILY_LIMIT = 100;
+const RESERVE_REQ = 2;
+function getTodayReqCount(){
+  const today = new Date().toDateString();
+  const saved = JSON.parse(localStorage.getItem('apiReqCount')||'{}');
+  if(saved.date !== today) return {date: today, count: 0};
+  return saved;
+}
+function canUseApi(isFinalCheck = false){
+  const data = getTodayReqCount();
+  if(isFinalCheck) return data.count < DAILY_LIMIT; // Final ke liye 2 bhi use kar sakta hai
+  return data.count < (DAILY_LIMIT - RESERVE_REQ); // Normal ke liye 98 tak hi
+}
+function incReqCount(){
+  const data = getTodayReqCount();
+  data.count = (data.count || 0) + 1;
+  data.date = new Date().toDateString();
+  localStorage.setItem('apiReqCount', JSON.stringify(data));
+  console.log(`API Used: ${data.count}/100`);
+}
+let apiMatches = [];
+
+function mergeAllAndRender(){
+  // Duplicate hatane ke liye createdAt se filter
+  let combined = [...apiMatches, ...firestoreMatches, ...localMatches];
+  let seen = new Set();
+  allMatches = combined.filter(m=>{
+    let id = m.createdAt || (m.team1+m.team2+m.title);
+    if(seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+  render();
+}
+
+// Firestore Listener - Admin Matches
+try{
+  onSnapshot(doc(db,"settings","main"), snap=>{
+    firestoreMatches = snap.exists() ? (snap.data().matches || []) : [];
+    mergeAllAndRender();
+  });
+}catch(e){
+  console.log("Firebase fail", e);
+  mergeAllAndRender();
+}
+
+setInterval(()=>{
+  if(currentMatchIndex>=0){
+    let m=allMatches[currentMatchIndex]; let d=getTimeObj(m); if(!d) return;
+    let now=Date.now();
+    if(m.status=='live'){ let el=document.getElementById('detailLiveTimer'); if(el) el.innerText=formatHMS(now-d.getTime()); }
+    if(m.status=='upcoming'){ let el=document.getElementById('detailUpTimer'); if(el){ let diff=d.getTime()-now; el.innerText= diff<=0?'Match Starting Soon':`Starting in ${formatHMS(diff)}`; } }
+  }
+},1000);
+const API_KEY = "6fbb3ec7-667f-48a4-878b-b3ac56bf61b1";
+async function fetchApiMatches(){
+  // REQ CHECK - 5 MIN LOGIC
+  const isAnyLive = apiMatches.some(m=>m.status==='live') || allMatches.some(m=>m.status==='live');
+  const isFinalNeeded = apiMatches.some(m=>m.status==='live') || allMatches.some(m=>m.status==='live');
+  
+  if(!canUseApi(isFinalNeeded)){
+    console.log("API Limit 98/100 reached, 2 reserved for final result");
+    const el = document.getElementById('apiStatus');
+    if(el) el.innerText = `Limit Reached (98/100) - Final Result Reserved`;
+    return;
+  }
+  try{
+    // req use hua toh count bada
+    incReqCount();
+    const res = await fetch(`https://api.cricapi.com/v1/currentMatches?apikey=${API_KEY}&offset=0`);
+    const json = await res.json();
+    if(json.status === "success" && json.data){
+      apiMatches = json.data.slice(0,10).map((m, idx) => {
+        // SCORE NIKALNA - FREE API ME BHI AATA HAI
+        let score1 = 0, score2 = 0, winnerAuto = '';
+        if(m.score && m.score.length >= 2){
+          // score[0].r = Team1 runs, score[1].r = Team2 runs
+          score1 = m.score[0]?.r || 0;
+          score2 = m.score[1]?.r || 0;
+          if(m.matchEnded){
+            if(score1 > score2) winnerAuto = 'team1';
+            else if(score2 > score1) winnerAuto = 'team2';
+            else winnerAuto = 'draw';
+          }
+        }
+        return {
+          team1: m.teamInfo?.[0]?.name || "Team A",
+          team2: m.teamInfo?.[1]?.name || "Team B",
+          logo1: m.teamInfo?.[0]?.img || "",
+          logo2: m.teamInfo?.[1]?.img || "",
+          title: m.name || "",
+          sport: "CRICKET",
+          status: m.matchEnded ? "ended" : (m.matchStarted ? "live" : "upcoming"),
+          winner: winnerAuto || m.winner || '', // AUTO WINNER
+          scoreDisplay: m.score ? `${score1}/${score2}` : '',
+          scoreRaw: m.score || [],
+          mTime: m.dateTimeGMT || m.date,
+          createdAt: "api-"+(m.id || idx),
+          fancies: [
+            {type:'winner', title:`Match Winner - ${m.teamInfo?.[0]?.name || 'Team A'}`, team1Bet:'100', team1Win:'185', team2Bet:'100', team2Win:'190'},
+            {type:'range', title:`Total Score Over 150.5`, bet:'100', win:'195', rule:`Live Score: ${score1}-${score2}`}
+          ],
+          endedAt: m.matchEnded ? Date.now() : 0
+        };
+      });
+      // AUTO SETTLEMENT TRIGGER - SCORE AATE HI
+      apiMatches.forEach(apiM => {
+        if(apiM.status === 'ended' && apiM.winner){
+          // Yaha pe local bets ko auto settle karo
+          myBets.forEach(b => {
+            if(b.match && b.match.includes(apiM.team1) && b.status === 'pending'){
+              if(b.side === apiM.winner || apiM.winner === 'draw'){
+                b.status = 'won';
+              } else {
+                b.status = 'lost';
+              }
+            }
+          });
+          localStorage.setItem('cricMyBets', JSON.stringify(myBets));
+        }
+      });
+      mergeAllAndRender();
+    }
+  }catch(e){ console.log("API fail", e); }
+}
+fetchApiMatches();
+function scheduleNextFetch(){
+  let isLive = allMatches.some(m => m.status === 'live');
+let nextTime = 300000; // FIX 5 MIN = 12 req/hour = 100 req se din bhar chalega
+  let statusEl = document.getElementById('apiStatus');
+  if(statusEl){
+    const used = getTodayReqCount().count||0;
+    if(isLive) statusEl.innerText = `Live • 5 min refresh • Used ${used}/100`;
+    else statusEl.innerText = `Auto • 5 min • Used ${used}/100`;
+  }
+ // Live = 30 sec, Nahi to 5 min
+  console.log(isLive ? "Live hai, 30 sec me next" : "Live nahi hai, 5 min me next");
+  setTimeout(() => {
+    fetchApiMatches().then(scheduleNextFetch);
+  }, nextTime);
+}
+scheduleNextFetch();
+</script></body></html>
